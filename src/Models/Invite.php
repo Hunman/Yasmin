@@ -12,21 +12,24 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents an invite.
  *
- * @property string                                                                                                  $code                The invite code.
- * @property \CharlotteDunois\Yasmin\Models\Guild|\CharlotteDunois\Yasmin\Models\PartialGuild|null                   $guild               The guild which this invite belongs to, or null.
- * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|\CharlotteDunois\Yasmin\Models\PartialChannel  $channel             The channel which this invite belongs to.
- * @property int|null                                                                                                $createdTimestamp    When this invite was created, or null.
- * @property \CharlotteDunois\Yasmin\Models\User|null                                                                $inviter             The inviter, or null.
- * @property int|null                                                                                                $maxUses             Maximum uses until the invite expires, or null.
- * @property int|null                                                                                                $maxAge              Duration (in seconds) until the invite expires, or null.
- * @property bool|null                                                                                               $revoked             If the invite is revoked, this will indicate it, or null.
- * @property bool|null                                                                                               $temporary           If this invite grants temporary membership, or null.
- * @property int|null                                                                                                $uses                Number of times this invite has been used, or null.
- * @property int|null                                                                                                $presenceCount       Approximate amount of presences, or null.
- * @property int|null                                                                                                $memberCount         Approximate amount of members, or null.
+ * @property string                                                                                                       $code                The invite code.
+ * @property string|\CharlotteDunois\Yasmin\Models\PartialGuild|null                                                      $guildID             The guild ID which this invite belongs to, or null.
+ * @property string|\CharlotteDunois\Yasmin\Models\PartialChannel                                                         $channelID           The channel ID which this invite belongs to.
+ * @property int|null                                                                                                     $createdTimestamp    When this invite was created, or null.
+ * @property string|null                                                                                                  $inviterID           The inviter ID, or null.
+ * @property int|null                                                                                                     $maxUses             Maximum uses until the invite expires, or null.
+ * @property int|null                                                                                                     $maxAge              Duration (in seconds) until the invite expires, or null.
+ * @property bool|null                                                                                                    $revoked             If the invite is revoked, this will indicate it, or null.
+ * @property bool|null                                                                                                    $temporary           If this invite grants temporary membership, or null.
+ * @property int|null                                                                                                     $uses                Number of times this invite has been used, or null.
+ * @property int|null                                                                                                     $presenceCount       Approximate amount of presences, or null.
+ * @property int|null                                                                                                     $memberCount         Approximate amount of members, or null.
  *
- * @property \DateTime|null                                                                                          $createdAt           The DateTime instance of the createdTimestamp, or null.
- * @property string                                                                                                  $url                 Returns the URL for the invite.
+ * @property \DateTime|null                                                                                               $createdAt           The DateTime instance of the createdTimestamp, or null.
+ * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|\CharlotteDunois\Yasmin\Models\PartialChannel|null  $channel             The channel which this invite belongs to, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|\CharlotteDunois\Yasmin\Models\PartialGuild|null                        $guild               The guild which this invite belongs to, or null.
+ * @property \CharlotteDunois\Yasmin\Models\User|null                                                                     $inviter             The inviter, or null.
+ * @property string                                                                                                       $url                 Returns the URL for the invite.
  */
 class Invite extends ClientBase {
     /**
@@ -37,15 +40,15 @@ class Invite extends ClientBase {
     
     /**
      * The guild this invite belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * @var string|\CharlotteDunois\Yasmin\Models\PartialGuild|null
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * The channel which this invite belongs to.
-     * @var \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|\CharlotteDunois\Yasmin\Models\PartialChannel
+     * @var string|\CharlotteDunois\Yasmin\Models\PartialChannel
      */
-    protected $channel;
+    protected $channelID;
     
     /**
      * When this invite was created, or null.
@@ -54,10 +57,10 @@ class Invite extends ClientBase {
     protected $createdTimestamp;
     
     /**
-     * The inviter, or null.
-     * @var \CharlotteDunois\Yasmin\Models\User|null
+     * The inviter ID, or null.
+     * @var string|null
      */
-    protected $inviter;
+    protected $inviterID;
     
     /**
      * Maximum uses until the invite expires, or null.
@@ -108,11 +111,10 @@ class Invite extends ClientBase {
         parent::__construct($client);
         
         $this->code = $invite['code'];
-        $this->guild = (!empty($invite['guild']) ? ($client->guilds->get($invite['guild']['id']) ?? (new \CharlotteDunois\Yasmin\Models\PartialGuild($client, $invite['guild']))) : null);
-        $this->channel = ($client->channels->get($invite['channel']['id']) ?? (new \CharlotteDunois\Yasmin\Models\PartialChannel($client, $invite['channel'])));
+        $this->guild = (!empty($invite['guild']) ? (($client->guilds->has($invite['guild']['id']) ? $client->guilds->get($invite['guild']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialGuild($client, $invite['guild']))) : null);
+        $this->channel = (($client->channels->has($invite['channel']['id']) ? $client->channels->get($invite['channel']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialChannel($client, $invite['channel'])));
         
         $this->createdTimestamp = (!empty($invite['created_at']) ? (new \DateTime($invite['created_at']))->getTimestamp() : null);
-        $this->inviter = (!empty($invite['inviter']) ? $client->users->patch($invite['inviter']) : null);
         $this->maxUses = $invite['max_uses'] ?? null;
         $this->maxAge = $invite['max_age'] ?? null;
         $this->revoked = $invite['revoked'] ?? null;
@@ -135,12 +137,29 @@ class Invite extends ClientBase {
         }
         
         switch($name) {
+            case 'channel':
+                if($this->channelID instanceof \CharlotteDunois\Yasmin\Models\PartialChannel) {
+                    return $this->channelID;
+                }
+                
+                return $this->client->channels->get($this->channelID);
+            break;
             case 'createdAt':
                 if($this->createdTimestamp !== null) {
                     return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
                 }
                 
                 return null;
+            break;
+            case 'guild':
+                if($this->guildID instanceof \CharlotteDunois\Yasmin\Models\PartialGuild) {
+                    return $this->guildID;
+                }
+                
+                return $this->client->guilds->get($this->guildID);
+            break;
+            case 'inviter':
+                return $this->client->users->get($this->inviterID);
             break;
             case 'url':
                 return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::HTTP['invite'].$this->code;

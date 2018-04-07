@@ -64,6 +64,12 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
             return $this->$name;
         }
         
+        if($name === 'guild' && \property_exists($this, 'guildID')) {
+            return $this->client->guilds->get($this->guildID);
+        } elseif($name === 'channel' && \property_exists($this, 'channelID')) {
+            return $this->client->channels->get($this->channelID);
+        }
+        
         throw new \RuntimeException('Unknown property '.\get_class($this).'::$'.$name);
     }
     

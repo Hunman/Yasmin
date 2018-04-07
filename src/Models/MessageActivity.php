@@ -14,8 +14,9 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property string|null                                   $partyID   The party ID associated with this message activity, or null.
  * @property int                                           $type      The message activity type. ({@see self::TYPES})
- * @property \CharlotteDunois\Yasmin\Models\User|null      $user      The user this message activity is for.
+ * @property string                                        $userID    The user ID this message activity is for.
  *
+ * @property \CharlotteDunois\Yasmin\Models\User|null      $user      The user this message activity is for, or null.
  * @property \CharlotteDunois\Yasmin\Models\Activity|null  $activity  The activity this message activity points to, or null.
  */
 class MessageActivity extends ClientBase {
@@ -44,10 +45,10 @@ class MessageActivity extends ClientBase {
     protected $type;
     
     /**
-     * The user this message activity is for.
-     * @var \CharlotteDunois\Yasmin\Models\User|null
+     * The user ID this message activity is for.
+     * @var string
      */
-    protected $user;
+    protected $userID;
     
     /**
      * @internal
@@ -60,8 +61,7 @@ class MessageActivity extends ClientBase {
         
         if($activity['party_id'] !== null) {
             $name = \explode(':', $activity['party_id']);
-            $uid = (string) ($name[1] ?? $name[0]);
-            $this->user = $this->client->users->get($uid);
+            $this->userID = (string) ($name[1] ?? $name[0]);
         }
     }
     
@@ -86,6 +86,9 @@ class MessageActivity extends ClientBase {
                 }
                 
                 return null;
+            break;
+            case 'user':
+                return $this->client->users->get($this->userID);
             break;
         }
         

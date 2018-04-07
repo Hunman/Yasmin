@@ -14,17 +14,17 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class EmojiStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\EmojiStorageInterface {
     /**
-     * The guild this storage belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * The guild ID this storage belongs to.
+     * @var string
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * @internal
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->guild = $guild;
+        $this->guildID = ($guild !== null ? $guild->id : null);
     }
     
     /**
@@ -102,18 +102,19 @@ class EmojiStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * Factory to create (or retrieve existing) emojis.
-     * @param array  $data
+     * @param array                                      $data
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Models\Emoji
      * @internal
      */
-    function factory(array $data) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if(parent::has($data['id'])) {
             $emoji = parent::get($data['id']);
             $emoji->_patch($data);
             return $emoji;
         }
         
-        $emoji = new \CharlotteDunois\Yasmin\Models\Emoji($this->client, $this->guild, $data);
+        $emoji = new \CharlotteDunois\Yasmin\Models\Emoji($this->client, ($guild ?? $this->client->guilds->get($this->guildID)), $data);
         
         if($emoji->id !== null) {
             $this->set($emoji->id, $emoji);

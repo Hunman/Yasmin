@@ -14,25 +14,27 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property string|null                                          $id                 The emoji ID, or null for unicode emoji.
  * @property string                                               $name               The emoji name.
- * @property \CharlotteDunois\Yasmin\Models\User|null             $user               The user that created the emoji, or null.
- * @property \CharlotteDunois\Yasmin\Models\Guild|null            $guild              The guild this emoji belongs to, or null.
+ * @property string|null                                          $guildID            The guild ID this emoji belongs to, or null.
  * @property int|null                                             $createdTimestamp   The timestamp of when this emoji was created, or null for unicode emoji.
  * @property bool                                                 $animated           Whether this emoji is animated.
  * @property boolean                                              $managed            Is the emoji managed?
  * @property boolean                                              $requireColons      Does the emoji require colons?
  * @property \CharlotteDunois\Yasmin\Utils\Collection             $roles              A collection of roles that this emoji is active for (empty if all).
+ * @property string|null                                          $userID             The user ID that created the emoji, or null.
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null            $guild              The guild this emoji belongs to, or null.
  * @property string                                               $identifier         The identifier for the emoji.
  * @property int|string                                           $uid                The used identifier in the system (ID or name, that is).
+ * @property \CharlotteDunois\Yasmin\Models\User|null             $user               The user that created the emoji, or null.
  * @property string                                               $url                DEPRECATED: The URL to the emoji image.
  */
 class Emoji extends ClientBase {
     /**
-     * The guild this emoji belongs to, or null.
-     * @var \CharlotteDunois\Yasmin\Models\Guild|null
+     * The guild ID this emoji belongs to, or null.
+     * @var string|null
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * The emoji ID, or null for unicode emoji.
@@ -53,10 +55,10 @@ class Emoji extends ClientBase {
     protected $roles;
     
     /**
-     * The user that created the emoji, or null.
-     * @var \CharlotteDunois\Yasmin\Models\User|null
+     * The user ID that created the emoji, or null.
+     * @var string|null
      */
-    protected $user;
+    protected $userID;
     
     /**
      * Does the emoji require colons?
@@ -85,7 +87,7 @@ class Emoji extends ClientBase {
         $this->id = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($emoji['id'] ?? null), 'string');
         $this->createdTimestamp = ($this->id ? ((int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp) : null);
         
-        $this->guild = ($this->id ? $guild : null);
+        $this->guildID = ($this->id ? $guild->id : null);
         $this->roles = new \CharlotteDunois\Yasmin\Utils\Collection();
         
         $this->_patch($emoji);
@@ -110,6 +112,9 @@ class Emoji extends ClientBase {
                 
                 return null;
             break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
+            break;
             case 'identifier':
                 if($this->id !== null) {
                     return $this->name.':'.$this->id;
@@ -122,6 +127,9 @@ class Emoji extends ClientBase {
             break;
             case 'url': // TODO: DEPRECATED
                 return $this->getImageURL();
+            break;
+            case 'user':
+                return $this->client->users->get($this->userID);
             break;
         }
         
@@ -313,7 +321,7 @@ class Emoji extends ClientBase {
      */
     function _patch(array $emoji) {
         $this->name = (string) $emoji['name'];
-        $this->user = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user']) : null);
+        $this->user = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user'])->id : null);
         $this->animated = (bool) ($emoji['animated'] ?? false);
         $this->managed = (bool) ($emoji['managed'] ?? false);
         $this->requireColons = (bool) ($emoji['require_colons'] ?? true);

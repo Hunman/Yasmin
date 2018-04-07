@@ -1192,7 +1192,7 @@ class Guild extends ClientBase {
      * @internal
      */
     function _addMember(array $member, bool $initial = false) {
-        $guildmember = $this->members->factory($member);
+        $guildmember = $this->members->factory($member, $this);
         
         if(!$initial) {
             $this->memberCount++;
@@ -1260,14 +1260,14 @@ class Guild extends ClientBase {
         if(isset($guild['roles'])) {
             $this->roles->clear();
             foreach($guild['roles'] as $role) {
-                $this->roles->factory($role);
+                $this->roles->factory($role, $this);
             }
         }
         
         if(isset($guild['emojis'])) {
             $this->emojis->clear();
             foreach($guild['emojis'] as $emoji) {
-                $this->emojis->factory($emoji);
+                $this->emojis->factory($emoji, $this);
             }
         }
         

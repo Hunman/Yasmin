@@ -14,9 +14,9 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property string                                                         $id               The ID of the member.
  * @property string|null                                                    $nickname         The nickname of the member, or null.
+ * @property string                                                         $guildID          The guild ID this member belongs to.
  * @property bool                                                           $deaf             Whether the member is server deafened.
  * @property bool                                                           $mute             Whether the member is server muted.
- * @property \CharlotteDunois\Yasmin\Models\Guild                           $guild            The guild this member belongs to.
  * @property int                                                            $joinedTimestamp  The timestamp of when this member joined.
  * @property bool                                                           $selfDeaf         Whether the member is locally deafened.
  * @property bool                                                           $selfMute         Whether the member is locally muted.
@@ -30,6 +30,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int|null                                                       $displayColor     DEPRECATED: The displayed color of the member.
  * @property string|null                                                    $displayHexColor  DEPRECATED: The displayed color of the member as hex string.
  * @property string                                                         $displayName      The displayed name.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null                      $guild            The guild this member belongs to, or null.
  * @property \CharlotteDunois\Yasmin\Models\Role                            $highestRole      DEPRECATED: The role of the member with the highest position.
  * @property \CharlotteDunois\Yasmin\Models\Role|null                       $hoistRole        DEPRECATED: The role used to show the member separately in the memberlist, or null.
  * @property \DateTime                                                      $joinedAt         An DateTime instance of joinedTimestamp.
@@ -41,10 +42,10 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class GuildMember extends ClientBase {
     /**
-     * The guild this member belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * The guild ID this member belongs to.
+     * @var string
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * The ID of the member.
@@ -117,7 +118,7 @@ class GuildMember extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $member) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->id = (string) $member['user']['id'];
         $this->client->users->patch($member['user']);

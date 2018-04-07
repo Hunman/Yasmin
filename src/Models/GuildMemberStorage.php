@@ -14,17 +14,17 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class GuildMemberStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\GuildMemberStorageInterface {
     /**
-     * The guild this storage belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * The guild ID this storage belongs to.
+     * @var string
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * @internal
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
     }
     
     /**
@@ -94,18 +94,19 @@ class GuildMemberStorage extends Storage implements \CharlotteDunois\Yasmin\Inte
     
     /**
      * Factory to create (or retrieve existing) guild members.
-     * @param array  $data
+     * @param array                                      $data
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Models\GuildMember
      * @internal
      */
-    function factory(array $data) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if(parent::has($data['user']['id'])) {
             $member = parent::get($data['user']['id']);
             $member->_patch($data);
             return $member;
         }
         
-        $member = new \CharlotteDunois\Yasmin\Models\GuildMember($this->client, $this->guild, $data);
+        $member = new \CharlotteDunois\Yasmin\Models\GuildMember($this->client, ($guild ?? $this->client->guilds->get($this->guildID)), $data);
         $this->set($member->id, $member);
         return $member;
     }

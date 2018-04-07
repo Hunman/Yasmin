@@ -14,17 +14,17 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\RoleStorageInterface {
     /**
-     * The guild this storage belongs to.
+     * The guild ID this storage belongs to.
      * @var \CharlotteDunois\Yasmin\Models\Guild
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * @internal
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $data = null) {
         parent::__construct($client, $data);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
     }
     
     /**
@@ -90,18 +90,19 @@ class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * Factory to create (or retrieve existing) roles.
-     * @param array  $data
+     * @param array                                      $data
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Models\Role
      * @internal
      */
-    function factory(array $data) {
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null) {
         if(parent::has($data['id'])) {
             $role = parent::get($data['id']);
             $role->_patch($data);
             return $role;
         }
         
-        $role = new \CharlotteDunois\Yasmin\Models\Role($this->client, $this->guild, $data);
+        $role = new \CharlotteDunois\Yasmin\Models\Role($this->client, ($guild ?? $this->client->guilds->get($this->guildID)), $data);
         $this->set($role->id, $role);
         return $role;
     }

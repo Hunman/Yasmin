@@ -12,15 +12,15 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a guild audit log entry.
  *
- * @property \CharlotteDunois\Yasmin\Models\AuditLog                                                    $log               The guild audit log which this entry belongs to.
- * @property string                                                                                     $id                The ID of the audit log.
- * @property array[]                                                                                    $changes           Specific property changes.
- * @property string                                                                                     $userID            The ID of the user which triggered the audit log.
- * @property string                                                                                     $actionType        Specific action type of this entry in its string presentation.
- * @property string|null                                                                                $reason            The specified reason, or null.
- * @property int                                                                                        $createdTimestamp  When this audit log entry was created.
- * @property mixed|null                                                                                 $extra             Any extra data from the entry, or null.
- * @property mixed|null                                                                                 $target            The target of this entry, or null.
+ * @property \CharlotteDunois\Yasmin\Models\AuditLog       $log               The guild audit log which this entry belongs to.
+ * @property string                                        $id                The ID of the audit log.
+ * @property array[]                                       $changes           Specific property changes.
+ * @property string                                        $userID            The ID of the user which triggered the audit log.
+ * @property string                                        $actionType        Specific action type of this entry in its string presentation.
+ * @property string|null                                   $reason            The specified reason, or null.
+ * @property int                                           $createdTimestamp  When this audit log entry was created.
+ * @property mixed|null                                    $extra             Any extra data from the entry, or null.
+ * @property mixed|null                                    $target            The target of this entry, or null.
  *
  * @property \DateTime                                                                                  $createdAt         The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\User|null                                                   $user              The user which triggered the audit log.

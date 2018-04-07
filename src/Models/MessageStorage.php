@@ -14,10 +14,10 @@ namespace CharlotteDunois\Yasmin\Models;
  */
 class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface {
     /**
-     * The channel this storage belongs to.
-     * @var \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface
+     * The channel ID this storage belongs to.
+     * @var string
      */
-    protected $channel;
+    protected $channelID;
     
     /**
      * The sweep timer, or null.
@@ -36,7 +36,7 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface $channel, ?array $data = null) {
         parent::__construct($client, $data);
-        $this->channel = $channel;
+        $this->channelID = $channel->id;
         $this->enabled = (bool) $this->client->getOption('messageCache', true);
         
         if($this->enabled) {
@@ -57,7 +57,10 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     function __destruct() {
         if($this->timer) {
             $this->client->cancelTimer($this->timer);
+            $this->timer = null;
         }
+        
+        parent::__destruct();
     }
     
     /**

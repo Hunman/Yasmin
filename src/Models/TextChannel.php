@@ -14,7 +14,7 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property string                                                      $id                     The channel ID.
  * @property string                                                      $type                   The channel type. ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES})
- * @property \CharlotteDunois\Yasmin\Models\Guild                        $guild                  The associated guild.
+ * @property string                                                      $guildID                The associated guild ID.
  * @property int                                                         $createdTimestamp       The timestamp of when this channel was created.
  * @property string                                                      $name                   The channel name.
  * @property string                                                      $topic                  The channel topic.
@@ -27,6 +27,7 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime                                                   $createdAt              The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\Message|null                 $lastMessage            DEPRECATED: The last message, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null                   $guild                  The associated guild.
  * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null         $parent                 The channel's parent, or null.
  * @property bool|null                                                   $permissionsLocked      DEPRECATED: If the permissionOverwrites match the parent channel, or null if no parent.
  */
@@ -37,10 +38,10 @@ class TextChannel extends ClientBase
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait, \CharlotteDunois\Yasmin\Traits\TextChannelTrait;
     
     /**
-     * The associated guild.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * The associated guild ID.
+     * @var string
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * The storage with all cached messages.
@@ -107,7 +108,7 @@ class TextChannel extends ClientBase
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $channel) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $storage = $this->client->getOption('internal.storages.messages');
         $this->messages = new $storage($this->client, $this);
@@ -137,6 +138,9 @@ class TextChannel extends ClientBase
         switch($name) {
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
+            break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
             break;
             case 'lastMessage': // TODO: DEPRECATED
                 return $this->getLastMessage();

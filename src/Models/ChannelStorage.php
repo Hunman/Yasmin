@@ -120,7 +120,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     /**
      * Factory to create (or retrieve existing) channels.
      * @param array                                      $data
-     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guilds
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface
      * @internal
      */

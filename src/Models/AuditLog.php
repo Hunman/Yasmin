@@ -12,17 +12,18 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a guild audit log.
  *
- * @property \CharlotteDunois\Yasmin\Models\Guild      $guild     Which guild this audit log is for.
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $entries   Holds the entries, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $users     Holds the found users in the audit log, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $webhooks  Holds the found webhooks in the audit log, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection   $entries   Holds the entries, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection   $users     Holds the found users in the audit log, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection   $webhooks  Holds the found webhooks in the audit log, mapped by their ID.
+ *
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null  $guild     Which guild this audit log is for, or null.
  */
 class AuditLog extends ClientBase {
     /**
      * Which guild this audit log is for.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * @var string
      */
-    protected $guild;
+    protected $guildID;
     
     /**
      * Holds the entries, mapped by their ID.
@@ -47,7 +48,7 @@ class AuditLog extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\Guild $guild, array $audit) {
         parent::__construct($client);
-        $this->guild = $guild;
+        $this->guildID = $guild->id;
         
         $this->entries = new \CharlotteDunois\Yasmin\Utils\Collection();
         $this->users = new \CharlotteDunois\Yasmin\Utils\Collection();
@@ -77,6 +78,10 @@ class AuditLog extends ClientBase {
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
+        }
+        
+        if($name === 'guild') {
+            return $this->client->guilds->get($this->guildID);
         }
         
         return parent::__get($name);

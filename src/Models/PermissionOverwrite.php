@@ -12,21 +12,22 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a permission overwrite.
  *
- * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface                              $channel   The channel this Permission Overwrite belongs to.
- * @property string                                                                                $id        The ID of the Permission Overwrite.
- * @property string                                                                                $type      The type of the overwrite (member or role).
- * @property \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target    The role or guildmember, or null if not a member.
- * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $allow     The allowed Permissions instance.
- * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $deny      The denied Permissions instance.
+ * @property string                                                                                $channelID  The channel ID this Permission Overwrite belongs to.
+ * @property string                                                                                $id         The ID of the Permission Overwrite.
+ * @property string                                                                                $type       The type of the overwrite (member or role).
+ * @property \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target     The role or guildmember, or null if not a member.
+ * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $allow      The allowed Permissions instance.
+ * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $deny       The denied Permissions instance.
  *
- * @property \CharlotteDunois\Yasmin\Models\Guild                                                  $guild     The guild this Permission Overwrite belongs to.
+ * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null                         $channel    The channel this Permission Overwrite belongs to, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Guild                                                  $guild      The guild this Permission Overwrite belongs to.
  */
 class PermissionOverwrite extends ClientBase {
     /**
-     * The channel this Permission Overwrite belongs to.
+     * The channel ID this Permission Overwrite belongs to.
      * @var \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface
      */
-    protected $channel;
+    protected $channelID;
     
     /**
      * The ID of the Permission Overwrite.
@@ -63,7 +64,7 @@ class PermissionOverwrite extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface $channel, array $permission) {
         parent::__construct($client);
-        $this->channel = $channel;
+        $this->channelID = $channel->id;
         
         $this->id = (string) $permission['id'];
         $this->type = (string) $permission['type'];
@@ -83,8 +84,24 @@ class PermissionOverwrite extends ClientBase {
         }
         
         switch($name) {
+            case 'channel':
+                return $this->client->channels->get($this->channelID);
+            break;
             case 'guild':
-                return $this->channel->guild;
+                $channel = $this->client->channels->get($this->channelID);
+                if($channel) {
+                    return $channel->guild;
+                }
+                
+                return null;
+            break;
+            case 'target':
+                $channel = $this->client->channels->get($this->channelID);
+                if($channel) {
+                    return ($this->type === 'role' ? $channel->guild->roles->get($permission['id']) : $channel->guild->members->get($permission['id']));
+                }
+                
+                return null;
             break;
             case 'target':
                 return ($this->type === 'role' ? $this->channel->guild->roles->get($this->id) : $this->channel->guild->members->get($this->id));
