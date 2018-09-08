@@ -14,7 +14,7 @@
 require_once(__DIR__.'/vendor/autoload.php');
 
 $loop = \React\EventLoop\Factory::create();
-$client = new \CharlotteDunois\Yasmin\Client($loop);
+$client = new \CharlotteDunois\Yasmin\Client($loop, $token);
 
 $client->once('ready', function () use ($client) {
     try {

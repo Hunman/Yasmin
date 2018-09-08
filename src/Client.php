@@ -187,7 +187,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     protected $utils = array();
     
     /**
-     * What do you expect this to do? It makes a new Client instance. Available client options are as following (all are optional, except for token):
+     * What do you expect this to do? It makes a new Client instance. Available client options are as following (all are optional):
      *
      * ```
      * array(
@@ -201,7 +201,6 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *   'minShardID' => int, (minimum shard ID to spawn - 0-indexed, if omitted, the client will determine the shards to spawn themself)
      *   'maxShardID' => int, (maximum shard ID to spawn - 0-indexed, if omitted, the client will determine the shards to spawn themself)
      *   'shardCount' => int, (shard count, if omitted, the client will determine the shards to spawn themself)
-     *   'token' => string, (the bot token, required)
      *   'userSweepInterval' => int, (interval when the user cache gets invalidated (users sharing no mutual guilds get removed), defaults to 600)
      *   'http.ratelimitbucket.name' => string, (class name of the custom ratelimit bucket, has to implement the interface)
      *   'http.restTimeOffset' => int|float, (specifies how many seconds should be waited after one REST request before the next REST request should be done)
@@ -217,6 +216,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * ```
      *
      * @param \React\EventLoop\LoopInterface|null  $loop     You can pass an event loop to the class, or it will automatically create one (you still need to make it run yourself).
+     * @param string                               $token    The bot token.
      * @param array                                $options  Any client options.
      * @throws \Exception
      * @throws \RuntimeException
@@ -224,7 +224,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *
      * @see \CharlotteDunois\Yasmin\ClientEvents
      */
-    function __construct(?\React\EventLoop\LoopInterface $loop = null, array $options = array()) {
+    function __construct(?\React\EventLoop\LoopInterface $loop = null, string $token, array $options = array()) {
         if(\PHP_SAPI !== 'cli') {
             throw new \Exception('Yasmin can only be used in the PHP CLI SAPI');
         }
@@ -232,10 +232,10 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             throw new \Exception('Yasmin does not support 32 bit PHP');
         }
         
+        $this->token = \trim($token);
+        
         if(!empty($options)) {
             $this->validateClientOptions($options);
-            $this->token = \trim($options['token']);
-            unset($options['token']);
             $this->options = \array_merge($this->options, $options);
         }
         
@@ -999,7 +999,6 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'minShardID' => 'integer|min:0',
             'maxShardID' => 'integer|min:0',
             'shardCount' => 'integer|min:1',
-            'token' => 'required|string|nowhitespace',
             'userSweepInterval' => 'integer|min:0',
             'http.ratelimitbucket.name' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\RatelimitBucketInterface,string_only',
             'http.requestErrorDelay' => 'integer|min:15',

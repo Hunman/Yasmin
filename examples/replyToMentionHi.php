@@ -15,7 +15,7 @@
 require_once(__DIR__.'/vendor/autoload.php');
 
 $loop = \React\EventLoop\Factory::create();
-$client = new \CharlotteDunois\Yasmin\Client($loop, array(
+$client = new \CharlotteDunois\Yasmin\Client($loop, $token, array(
     'ws.disabledEvents' => array(
         /* We disable the TYPING_START event to save CPU cycles, we don't need it here in this example. */
         'TYPING_START'
