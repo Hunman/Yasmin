@@ -730,7 +730,7 @@ class Guild extends ClientBase {
     
     /**
      * Fetches a specific ban for a user. Resolves with an instance of GuildBan.
-     * @param \CharlotteDunois\Yasmin\Models\User|string  $user     An User instance or the user ID.
+     * @param \CharlotteDunois\Yasmin\Models\User|int  $user     An User instance or the user ID.
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\GuildBan
      */

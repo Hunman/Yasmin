@@ -11,6 +11,7 @@ namespace CharlotteDunois\Yasmin\Models;
 
 /**
  * Represents a guild's category channel.
+ *
  * @property int                                                  $id                     The ID of the channel.
  * @property string                                               $name                   The channel name.
  * @property string                                               $type                   The channel type ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES}).
