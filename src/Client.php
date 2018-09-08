@@ -224,7 +224,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      *
      * @see \CharlotteDunois\Yasmin\ClientEvents
      */
-    function __construct(?\React\EventLoop\LoopInterface $loop = null, string $token, array $options = array()) {
+    function __construct(?\React\EventLoop\LoopInterface $loop, string $token, array $options = array()) {
         if(\PHP_SAPI !== 'cli') {
             throw new \Exception('Yasmin can only be used in the PHP CLI SAPI');
         }
