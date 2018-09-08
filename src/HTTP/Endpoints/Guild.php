@@ -42,7 +42,7 @@ final class Guild {
             'get' => 'guilds/%d/bans/%d',
             'list' => 'guilds/%d/bans',
             'create' => 'guilds/%d/bans/%d',
-            'remove' => 'guilds/%d/bans/%d'r
+            'remove' => 'guilds/%d/bans/%d'
         ),
         'roles' => array(
             'list' => 'guilds/%d/roles',
