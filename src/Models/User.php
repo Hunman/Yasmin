@@ -16,7 +16,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                               $username           The username.
  * @property string                                               $discriminator      The discriminator of this user.
  * @property boolean                                              $bot                Is the user a bot? Or are you a bot?
- * @property string                                               $avatar             The hash of the user's avatar.
+ * @property string|null                                          $avatar             The hash of the user's avatar, or null.
  * @property string                                               $email              An email address or maybe nothing at all. More likely to be nothing at all.
  * @property boolean|null                                         $mfaEnabled         Whether the user has two factor enabled on their account, or null if no information provided.
  * @property boolean|null                                         $verified           Whether the email on this account has been verified, or null if no information provided.
@@ -25,27 +25,75 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int|null                                             $lastMessageID      The last message ID from the user while the bot was online, or null.
  *
  * @property \DateTime                                            $createdAt          An DateTime instance of the createdTimestamp.
- * @property int                                                  $defaultAvatar      The identifier of the default avatar for this user.
- * @property \CharlotteDunois\Yasmin\Models\DMChannel|null        $dmChannel          The DM channel for this user, if it exists, or null.
- * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage        The laste message the user sent while the client was online, or null.
- * @property \CharlotteDunois\Yasmin\Models\Presence|null         $presence           The presence for this user, or null.
+ * @property int                                                  $defaultAvatar      DEPRECATED: The identifier of the default avatar for this user.
+ * @property \CharlotteDunois\Yasmin\Models\DMChannel|null        $dmChannel          DEPRECATED: The DM channel for this user, if it exists, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage        DEPRECATED (with no replacement): The last message the user sent while the client was online, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Presence|null         $presence           DEPRECATED: The presence for this user, or null.
  * @property string                                               $tag                Username#Discriminator.
  */
 class User extends ClientBase {
+    /**
+     * The user ID.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * The username.
+     * @var string
+     */
     protected $username;
+    
+    /**
+     * The discriminator of this user.
+     * @var string
+     */
     protected $discriminator;
+    
+    /**
+     * Is the user a bot? Or are you a bot?
+     * @var bool
+     */
     protected $bot;
+    
+    /**
+     * The hash of the user's avatar, or null.
+     * @var string|null
+     */
     protected $avatar;
+    
+    /**
+     * An email address or maybe nothing at all. More likely to be nothing at all.
+     * @var string
+     */
     protected $email;
+    
+    /**
+     * Whether the user has two factor enabled on their account, or null if no information provided.
+     * @var bool|null
+     */
     protected $mfaEnabled;
+    
+    /**
+     * Whether the email on this account has been verified, or null if no information provided.
+     * @var bool|null
+     */
     protected $verified;
+    
+    /**
+     * Determines wether the user is a webhook or not.
+     * @var bool
+     */
     protected $webhook;
     
+    /**
+     * The timestamp of when this user was created.
+     * @var int
+     */
     protected $createdTimestamp;
     
     /**
-     * The last ID of the message the user sent while the client was online, or null.
+     * DEPRECATED: The last ID of the message the user sent while the client was online, or null.
      * @var string|null
      */
     public $lastMessageID;
@@ -81,17 +129,17 @@ class User extends ClientBase {
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
-            case 'defaultAvatar':
+            case 'defaultAvatar': // TODO: DEPRECATED
                 return ($this->discriminator % 5);
             break;
-            case 'dmChannel':
+            case 'dmChannel': // TODO: DEPRECATED
                 $channel = $this->client->channels->first(function ($channel) {
                     return ($channel->type === 'dm' && $channel->isRecipient($this));
                 });
                 
                 return $channel;
             break;
-            case 'lastMessage':
+            case 'lastMessage': // TODO: DEPRECATED
                 if($this->lastMessageID !== null) {
                     $channel = $this->client->channels->first(function ($channel) {
                         return ($channel->type === 'text' && $channel->messages->has($this->lastMessageID));
@@ -104,21 +152,8 @@ class User extends ClientBase {
                 
                 return null;
             break;
-            case 'presence':
-                if($this->client->presences->has($this->id)) {
-                    return $this->client->presences->get($this->id);
-                }
-                
-                foreach($this->client->guilds as $guild) {
-                    if($guild->presences->has($this->id)) {
-                        $presence = $guild->presences->get($this->id);
-                        $this->client->presences->set($this->id, $presence);
-                        
-                        return $presence;
-                    }
-                }
-                
-                return null;
+            case 'presence': // TODO: DEPRECATED
+                return $this->getPresence();
             break;
             case 'tag':
                 return $this->username.'#'.$this->discriminator;
@@ -145,7 +180,10 @@ class User extends ClientBase {
      */
     function createDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->dmChannel;
+            $channel = $this->client->channels->first(function ($channel) {
+                return ($channel->type === 'dm' && $channel->isRecipient($this));
+            });
+            
             if($channel) {
                 return $resolve($channel);
             }
@@ -163,7 +201,10 @@ class User extends ClientBase {
      */
     function deleteDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->dmChannel;
+            $channel = $this->client->channels->first(function ($channel) {
+                return ($channel->type === 'dm' && $channel->isRecipient($this));
+            });
+            
             if(!$channel) {
                 return $resolve($this);
             }
@@ -231,6 +272,27 @@ class User extends ClientBase {
     }
     
     /**
+     * Gets the presence for this user, or null.
+     * @return \CharlotteDunois\Yasmin\Models\Presence|null
+     */
+    function getPresence() {
+        if($this->client->presences->has($this->id)) {
+            return $this->client->presences->get($this->id);
+        }
+        
+        foreach($this->client->guilds as $guild) {
+            if($guild->presences->has($this->id)) {
+                $presence = $guild->presences->get($this->id);
+                $this->client->presences->set($this->id, $presence);
+                
+                return $presence;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
      * Fetches the User's connections. Requires connections scope. Resolves with a Collection of UserConnection instances, mapped by their ID.
      * @param string  $accessToken
      * @return \React\Promise\ExtendedPromiseInterface
@@ -263,11 +325,11 @@ class User extends ClientBase {
      * @internal
      */
     function _patch(array $user) {
-        $this->username = $user['username'];
-        $this->discriminator = $user['discriminator'] ?? '0000';
+        $this->username = (string) $user['username'];
+        $this->discriminator = (string) ($user['discriminator'] ?? '0000');
         $this->bot = (!empty($user['bot']));
-        $this->avatar = $user['avatar'];
-        $this->email = (!empty($user['email']) ? $user['email'] : '');
+        $this->avatar = $user['avatar'] ?? null;
+        $this->email = (string) ($user['email'] ?? '');
         $this->mfaEnabled = (isset($user['mfa_enabled']) ? !empty($user['mfa_enabled']) : null);
         $this->verified = (isset($user['verified']) ? !empty($user['verified']) : null);
     }

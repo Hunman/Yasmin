@@ -15,7 +15,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\Guild        $guild               The guild the role belongs to.
  * @property int                                         $id                  The role ID.
  * @property string                                      $name                The role name.
- * @property int                                         $createdTimestamp    When the role was created.
+ * @property int                                         $createdTimestamp    The timestamp of when the role was created.
  * @property int                                         $color               The color of the role.
  * @property bool                                        $hoist               Whether the role gets displayed separately in the member list.
  * @property int                                         $position            The position of the role in the API.
@@ -23,9 +23,9 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property bool                                        $managed             Whether the role is managed by an integration.
  * @property bool                                        $mentionable         Whether the role is mentionable.
  *
- * @property int                                         $calculatedPosition  The role position in the role manager.
+ * @property int                                         $calculatedPosition  DEPRECATED: The role position in the role manager.
  * @property \DateTime                                   $createdAt           The DateTime instance of createdTimestamp.
- * @property bool                                        $editable            Whether the role can be edited by the client user.
+ * @property bool                                        $editable            DEPRECATED: Whether the role can be edited by the client user.
  * @property string                                      $hexColor            Returns the hex color of the role color.
  * @property \CharlotteDunois\Yasmin\Utils\Collection    $members             A collection of all (cached) guild members which have the role.
  */
@@ -58,17 +58,64 @@ class Role extends ClientBase {
         'DARK_NAVY' => 2899536
     );
     
+    /**
+     * The guild the role belongs to.
+     * @var \CharlotteDunois\Yasmin\Models\Guild
+     */
     protected $guild;
     
+    /**
+     * The role ID.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * The role name.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * The color of the role.
+     * @var int
+     */
     protected $color;
+    
+    /**
+     * Whether the role gets displayed separately in the member list.
+     * @var bool
+     */
     protected $hoist;
+    
+    /**
+     * The position of the role in the API.
+     * @var int
+     */
     protected $position;
+    
+    /**
+     * The permissions of the role.
+     * @var \CharlotteDunois\Yasmin\Models\Permissions
+     */
     protected $permissions;
+    
+    /**
+     * Whether the role is managed by an integration.
+     * @var bool
+     */
     protected $managed;
+    
+    /**
+     * Whether the role is mentionable.
+     * @var bool
+     */
     protected $mentionable;
     
+    /**
+     * The timestamp of when the role was created.
+     * @var int
+     */
     protected $createdTimestamp;
     
     /**
@@ -96,27 +143,14 @@ class Role extends ClientBase {
         }
         
         switch($name) {
-            case 'calculatedPosition':
-                $sorted = $this->guild->roles->sortByDesc(function ($role) {
-                    return $role->position;
-                });
-                
-                return $sorted->indexOf($this);
+            case 'calculatedPosition': // TODO: DEPRECATED
+                return $this->getCalculatedPosition();
             break;
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
-            case 'editable':
-                if($this->managed) {
-                    return false;
-                }
-                
-                $member = $this->guild->me;
-                if(!$member->permissions->has(\CharlotteDunois\Yasmin\Models\Permissions::PERMISSIONS['MANAGE_ROLES'])) {
-                    return false;
-                }
-                
-                return ($member->highestRole->comparePositionTo($this) > 0);
+            case 'editable': // TODO: DEPRECATED
+                return $this->isEditable();
             break;
             case 'hexColor':
                 return '#'.\dechex($this->color);
@@ -222,6 +256,35 @@ class Role extends ClientBase {
     }
     
     /**
+     * Calculates the positon of the role in the Discord client.
+     * @return int
+     */
+    function getCalculatedPosition() {
+        $sorted = $this->guild->roles->sortByDesc(function ($role) {
+            return $role->position;
+        });
+        
+        return $sorted->indexOf($this);
+    }
+    
+    /**
+     * Whether the role can be edited by the client user.
+     * @return bool
+     */
+    function isEditable() {
+        if($this->managed) {
+            return false;
+        }
+        
+        $member = $this->guild->me;
+        if(!$member->permissions->has(\CharlotteDunois\Yasmin\Models\Permissions::PERMISSIONS['MANAGE_ROLES'])) {
+            return false;
+        }
+        
+        return ($member->highestRole->comparePositionTo($this) > 0);
+    }
+    
+    /**
      * Set the color of the role. Resolves with $this.
      * @param int|string  $color
      * @param string      $reason
@@ -301,12 +364,12 @@ class Role extends ClientBase {
      * @internal
      */
     function _patch(array $role) {
-        $this->name = $role['name'];
-        $this->color = $role['color'];
-        $this->hoist = $role['hoist'];
-        $this->position = $role['position'];
+        $this->name = (string) $role['name'];
+        $this->color = (int) $role['color'];
+        $this->hoist = (bool) $role['hoist'];
+        $this->position = (int) $role['position'];
         $this->permissions = new \CharlotteDunois\Yasmin\Models\Permissions($role['permissions']);
-        $this->managed = $role['managed'];
-        $this->mentionable = $role['mentionable'];
+        $this->managed = (bool) $role['managed'];
+        $this->mentionable = (bool) $role['mentionable'];
     }
 }

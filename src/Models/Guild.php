@@ -23,11 +23,11 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property bool                                                           $large                        Whether the guild is considered large.
  * @property bool                                                           $lazy                         Whether this guild is run in lazy mode (on the Discord node).
  * @property int                                                            $memberCount                  How many members the guild has.
- * @property \CharlotteDunois\Yasmin\Models\ChannelStorage                  $channels                     Holds a guild's channels, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Models\EmojiStorage                    $emojis                       Holds a guild's emojis, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Models\GuildMemberStorage              $members                      Holds a guild's cached members, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Models\RoleStorage                     $roles                        Holds a guild's roles, mapped by their ID.
- * @property \CharlotteDunois\Yasmin\Models\PresenceStorage                 $presences                    Holds a guild's presences of members, mapped by user ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface            $channels                     Holds a guild's channels, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface            $emojis                       Holds a guild's emojis, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface            $members                      Holds a guild's cached members, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface            $roles                        Holds a guild's roles, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface            $presences                    Holds a guild's presences of members, mapped by user ID.
  * @property string                                                         $defaultMessageNotifications  The type of message that should notify you. ({@see Guild::DEFAULT_MESSAGE_NOTIFICATIONS})
  * @property string                                                         $explicitContentFilter        The explicit content filter level of the guild. ({@see Guild::EXPLICIT_CONTENT_FILTER})
  * @property string                                                         $region                       The region the guild is located in.
@@ -48,7 +48,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\Role                            $defaultRole                  The guild's default role.
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null  $embedChannel                 The guild's embed channel, or null.
  * @property \CharlotteDunois\Yasmin\Models\GuildMember                     $me                           The guild member of the client user.
- * @property string                                                         $nameAcronym                  The acronym that shows up in place of a guild icon.
+ * @property string                                                         $nameAcronym                  DEPRECATED: The acronym that shows up in place of a guild icon.
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null  $systemChannel                The guild's system channel, or null.
  * @property bool                                                           $vanityURL                    Whether the guild has a vanity invite url.
  * @property bool                                                           $verified                     Whether the guild is verified.
@@ -99,40 +99,184 @@ class Guild extends ClientBase {
         4 => 'VERY_HIGH'
     );
     
+    /**
+     * Holds a guild's channels, mapped by their ID.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $channels;
+    
+    /**
+     * Holds a guild's emojis, mapped by their ID.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $emojis;
+    
+    /**
+     * Holds a guild's cached members, mapped by their ID.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $members;
+    
+    /**
+     * Holds a guild's presences of members, mapped by user ID.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $presences;
+    
+    /**
+     * Holds a guild's roles, mapped by their ID.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $roles;
     
+    /**
+     * The guild ID.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * On which shard this guild is.
+     * @var int
+     */
+    protected $shardID;
+    
+    /**
+     * Whether the guild is available.
+     * @var bool
+     */
     protected $available;
     
+    /**
+     * The guild name.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * The guild icon hash, or null.
+     * @var string|null
+     */
     protected $icon;
+    
+    /**
+     * The guild splash hash, or null.
+     * @var string|null
+     */
     protected $splash;
+    
+    /**
+     * The ID of the owner.
+     * @var string
+     */
     protected $ownerID;
+    
+    /**
+     * Whether the guild is considered large.
+     * @var bool
+     */
     protected $large;
+    
+    /**
+     * Whether this guild is run in lazy mode (on the Discord node).
+     * @var bool
+     */
     protected $lazy;
+    
+    /**
+     * How many members the guild has.
+     * @var int
+     */
     protected $memberCount = 0;
     
+    /**
+     * The type of message that should notify you.
+     * @var string
+     */
     protected $defaultMessageNotifications;
+    
+    /**
+     * The explicit content filter level of the guild.
+     * @var string
+     */
     protected $explicitContentFilter;
+    
+    /**
+     * The region the guild is located in.
+     * @var string
+     */
     protected $region;
+    
+    /**
+     * The verification level of the guild.
+     * @var string
+     */
     protected $verificationLevel;
+    
+    /**
+     * The ID of the system channel, or null.
+     * @var string|null
+     */
     protected $systemChannelID;
     
+    /**
+     * The ID of the afk channel, or null.
+     * @var string|null
+     */
     protected $afkChannelID;
+    
+    /**
+     *
+     * @var int|null
+     */
     protected $afkTimeout;
+    
+    /**
+     * Enabled features for this guild.
+     * @var string[]
+     */
     protected $features;
+    
+    /**
+     * The required MFA level for the guild.
+     * @var string
+     */
     protected $mfaLevel;
+    
+    /**
+     * The ID of the application which created this guild, or null.
+     * @var string|null
+     */
     protected $applicationID;
     
+    /**
+     * Whether the guild is embeddable or not (e.g. widget).
+     * @var bool
+     */
     protected $embedEnabled;
+    
+    /**
+     * The ID of the embed channel, or null.
+     * @var string|null
+     */
     protected $embedChannelID;
+    
+    /**
+     * Whether the widget is enabled.
+     * @var bool
+     */
     protected $widgetEnabled;
+    
+    /**
+     * The ID of the widget channel, or null.
+     * @var string|null
+     */
     protected $widgetChannelID;
     
+    /**
+     * The timestamp when this guild was created.
+     * @var int
+     */
     protected $createdTimestamp;
     
     /**
@@ -196,15 +340,8 @@ class Guild extends ClientBase {
             case 'me':
                 return $this->members->get($this->client->user->id);
             break;
-            case 'nameAcronym':
-                \preg_match_all('/\w+/iu', $this->name, $matches);
-                
-                $name = '';
-                foreach($matches[0] as $word) {
-                    $name .= $word[0];
-                }
-                
-                return \mb_strtoupper($name);
+            case 'nameAcronym': // TODO: DEPRECATED
+                return $this->getNameAcronym();
             break;
             case 'systemChannel':
                 return $this->channels->get($this->systemChannelID);
@@ -592,8 +729,30 @@ class Guild extends ClientBase {
     }
     
     /**
-     * Fetch all bans of the guild. Resolves with a Collection of array('reason' => string|null, 'user' => User), mapped by the user ID.
+     * Fetches a specific ban for a user. Resolves with an instance of GuildBan.
+     * @param \CharlotteDunois\Yasmin\Models\User|string  $user     An User instance or the user ID.
      * @return \React\Promise\ExtendedPromiseInterface
+     * @see \CharlotteDunois\Yasmin\Models\GuildBan
+     */
+    function fetchBan($user) {
+        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($user) {
+            if($user instanceof \CharlotteDunois\Yasmin\Models\User) {
+                $user = $user->id;
+            }
+            
+            $this->client->apimanager()->endpoints->guild->getGuildBan($this->id, $user)->done(function ($data) use ($resolve) {
+                $user = $this->client->users->patch($data['user']);
+                $ban = new \CharlotteDunois\Yasmin\Models\GuildBan($this->client, $this, $user, ($data['reason'] ?? null));
+                
+                $resolve($ban);
+            }, $reject);
+        }));
+    }
+    
+    /**
+     * Fetch all bans of the guild. Resolves with a Collection of GuildBan instances, mapped by the user ID.
+     * @return \React\Promise\ExtendedPromiseInterface
+     * @see \CharlotteDunois\Yasmin\Models\GuildBan
      */
     function fetchBans() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
@@ -602,10 +761,9 @@ class Guild extends ClientBase {
                 
                 foreach($data as $ban) {
                     $user = $this->client->users->patch($ban['user']);
-                    $collect->set($user->id, array(
-                        'reason' => ($ban['reason'] ?? null),
-                        'user' => $user
-                    ));
+                    $gban = new \CharlotteDunois\Yasmin\Models\GuildBan($this->client, $this, $user, ($ban['reason'] ?? null));
+                    
+                    $collect->set($user->id, $gban);
                 }
                 
                 $resolve($collect);
@@ -785,6 +943,21 @@ class Guild extends ClientBase {
         }
         
         return null;
+    }
+    
+    /**
+     * Returns the guild's name acronym.
+     * @return string
+     */
+    function getNameAcronym() {
+        \preg_match_all('/\w+/iu', $this->name, $matches);
+        
+        $name = '';
+        foreach($matches[0] as $word) {
+            $name .= $word[0];
+        }
+        
+        return \mb_strtoupper($name);
     }
     
     /**
@@ -1060,27 +1233,30 @@ class Guild extends ClientBase {
             return;
         }
         
-        $this->ownerID = (int) ($guild['owner_id'] ?? $this->ownerID);
+        $this->name = (string) ($guild['name'] ?? $this->name);
+        $this->icon = $guild['icon'] ?? $this->icon;
+        $this->splash = $guild['splash'] ?? $this->splash;
+        $this->ownerID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['owner_id'] ?? $this->ownerID), 'int');
         $this->large = (bool) ($guild['large'] ?? $this->large);
         $this->lazy = !empty($guild['lazy']);
-        $this->memberCount = $guild['member_count']  ?? $this->memberCount;
+        $this->memberCount = (int) ($guild['member_count']  ?? $this->memberCount);
         
         $this->defaultMessageNotifications = (isset($guild['default_message_notifications']) ? (self::DEFAULT_MESSAGE_NOTIFICATIONS[$guild['default_message_notifications']] ?? $this->defaultMessageNotifications) : $this->defaultMessageNotifications);
         $this->explicitContentFilter = (isset($guild['explicit_content_filter']) ? (self::EXPLICIT_CONTENT_FILTER[$guild['explicit_content_filter']] ?? $this->explicitContentFilter) : $this->explicitContentFilter);
         $this->region = $guild['region'] ?? $this->region;
         $this->verificationLevel = (isset($guild['verification_level']) ? (self::VERIFICATION_LEVEL[$guild['verification_level']] ?? $this->verificationLevel) : $this->verificationLevel);
-        $this->systemChannelID = (isset($guild['system_channel_id']) ? ($guild['system_channel_id'] ? ((int) $guild['system_channel_id']) : null) : $this->systemChannelID);
+        $this->systemChannelID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['system_channel_id'] ?? $this->systemChannelID), 'int');
         
-        $this->afkChannelID = (!empty($guild['afk_channel_id']) ? ((int) $guild['afk_channel_id']) : $this->afkChannelID);
+        $this->afkChannelID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['afk_channel_id'] ?? $this->afkChannelID), 'int');
         $this->afkTimeout = $guild['afk_timeout'] ?? $this->afkTimeout;
         $this->features = $guild['features'] ?? $this->features;
         $this->mfaLevel = (isset($guild['mfa_level']) ? (self::MFA_LEVEL[$guild['mfa_level']] ?? $this->mfaLevel) : $this->mfaLevel);
-        $this->applicationID = (isset($guild['application_id']) ? ($guild['application_id'] ? ((int) $guild['application_id']) : null) : $this->applicationID);
+        $this->applicationID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['application_id'] ?? $this->applicationID), 'int');
         
         $this->embedEnabled = (bool) ($guild['embed_enabled'] ?? $this->embedEnabled);
-        $this->embedChannelID = (isset($guild['embed_channel_id']) ? ($guild['embed_channel_id'] ? ((int) $guild['embed_channel_id']) : null) : $this->embedChannelID);
+        $this->embedChannelID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['embed_channel_id'] ?? $this->embedChannelID), 'int');
         $this->widgetEnabled = (bool) ($guild['widget_enabled'] ?? $this->widgetEnabled);
-        $this->widgetChannelID = (isset($guild['widget_channel_id']) ? ($guild['widget_channel_id'] ? ((int) $guild['widget_channel_id']) : null) : $this->widgetChannelID);
+        $this->widgetChannelID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($guild['widget_channel_id'] ?? $this->widgetChannelID), 'int');
         
         if(isset($guild['roles'])) {
             $this->roles->clear();

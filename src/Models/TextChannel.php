@@ -23,7 +23,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int                                                  $position               The channel position.
  * @property \CharlotteDunois\Yasmin\Utils\Collection             $permissionOverwrites   A collection of PermissionOverwrite instances.
  * @property int|null                                             $lastMessageID          The last message ID, or null.
- * @property \CharlotteDunois\Yasmin\Models\MessageStorage        $messages               The storage with all cached messages.
+ * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface  $messages               The storage with all cached messages.
  *
  * @property \DateTime                                            $createdAt              The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage            The last message, or null.
@@ -36,22 +36,71 @@ class TextChannel extends ClientBase
                 \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait, \CharlotteDunois\Yasmin\Traits\TextChannelTrait;
     
+    /**
+     * The associated guild.
+     * @var \CharlotteDunois\Yasmin\Models\Guild
+     */
     protected $guild;
     
+    /**
+     * The storage with all cached messages.
+     * @var \CharlotteDunois\Yasmin\Interfaces\StorageInterface
+     */
     protected $messages;
-    protected $typings;
     
+    /**
+     * The channel ID.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * The channel type.
+     * @var string
+     */
     protected $type;
+    
+    /**
+     * The ID of the parent channel, or null.
+     * @var string|null
+     */
     protected $parentID;
+    
+    /**
+     * The channel name.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * The channel topic.
+     * @var string
+     */
     protected $topic;
+    
+    /**
+     * Whether the channel is marked as NSFW or not.
+     * @var bool
+     */
     protected $nsfw;
+    
+    /**
+     * The channel position.
+     * @var int
+     */
     protected $position;
+    
+    /**
+     * A collection of PermissionOverwrite instances, mapped by their ID.
+     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     */
     protected $permissionOverwrites;
     
+    /**
+     * The timestamp of when this channel was created.
+     * @var int
+     */
     protected $createdTimestamp;
-    protected $lastMessageID;
     
     /**
      * @internal
@@ -66,7 +115,7 @@ class TextChannel extends ClientBase
         
         $this->id = (int) $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
-        $this->lastMessageID = (!empty($channel['last_message_id']) ? ((int) $channel['last_message_id']) : null);
+        $this->lastMessageID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($channel['last_message_id'] ?? null), 'int');
         
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
         $this->permissionOverwrites = new \CharlotteDunois\Yasmin\Utils\Collection();
@@ -89,30 +138,14 @@ class TextChannel extends ClientBase
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
-            case 'lastMessage':
-                if(!empty($this->lastMessageID) && $this->messages->has($this->lastMessageID)) {
-                    return $this->messages->get($this->lastMessageID);
-                }
-                
-                return null;
+            case 'lastMessage': // TODO: DEPRECATED
+                return $this->getLastMessage();
             break;
             case 'parent':
                 return $this->guild->channels->get($this->parentID);
             break;
-            case 'permissionsLocked':
-                $parent = $this->parent;
-                if($parent) {
-                    if($parent->permissionOverwrites->count() !== $this->permissionOverwrites->count()) {
-                        return false;
-                    }
-                    
-                    return !((bool) $this->permissionOverwrites->first(function ($perm) use ($parent) {
-                        $permp = $parent->permissionOverwrites->get($perm->id);
-                        return (!$permp || $perm->allowed->bitfield !== $permp->allowed->bitfield || $perm->denied->bitfield !== $permp->denied->bitfield);
-                    }));
-                }
-                
-                return null;
+            case 'permissionsLocked': // TODO: DEPRECATED
+                return $this->isPermissionsLocked();
             break;
         }
         
@@ -182,7 +215,7 @@ class TextChannel extends ClientBase
         $this->name = (string) ($channel['name'] ?? $this->name ?? '');
         $this->topic = (string) ($channel['topic'] ?? $this->topic ?? '');
         $this->nsfw = (bool) ($channel['nsfw'] ?? $this->nsfw ?? false);
-        $this->parentID = (!empty($channel['parent_id']) ? ((int) $channel['parent_id']) : ($this->parentID ?? null));
+        $this->parentID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($channel['parent_id'] ?? $this->parentID ?? null), 'int');
         $this->position = (int) ($channel['position'] ?? $this->position ?? 0);
         
         if(isset($channel['permission_overwrites'])) {

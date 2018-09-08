@@ -19,11 +19,34 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\User  $user               The user which this user connection belongs to.
  */
 class UserConnection extends ClientBase {
+    /**
+     * The user which this user connection belongs to.
+     * @var \CharlotteDunois\Yasmin\Models\User
+     */
     protected $user;
     
+    /**
+     * The ID of the connection account.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * The username of the connection account.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * The type of the user connection (e.g. twitch, youtube).
+     * @var string
+     */
     protected $type;
+    
+    /**
+     *  Whether the connection is revoked.
+     * @var bool
+     */
     protected $revoked;
     
     /**

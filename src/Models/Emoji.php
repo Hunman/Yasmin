@@ -24,18 +24,55 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
  * @property string                                               $identifier         The identifier for the emoji.
- * @property string|null                                          $url                The URL to the emoji image, or null for unicode emoji.
+ * @property string                                               $url                DEPRECATED: The URL to the emoji image.
  */
 class Emoji extends ClientBase {
+    /**
+     * The guild this emoji belongs to, or null.
+     * @var \CharlotteDunois\Yasmin\Models\Guild|null
+     */
     protected $guild;
     
+    /**
+     * The emoji ID, or null for unicode emoji.
+     * @var string|null
+     */
     protected $id;
+    
+    /**
+     * The emoji name.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * A collection of roles that this emoji is active for (empty if all).
+     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     */
     protected $roles;
+    
+    /**
+     * The user that created the emoji, or null.
+     * @var \CharlotteDunois\Yasmin\Models\User|null
+     */
     protected $user;
+    
+    /**
+     * Does the emoji require colons?
+     * @var bool
+     */
     protected $requireColons;
+    
+    /**
+     * Is the emoji managed?
+     * @var bool
+     */
     protected $managed;
     
+    /**
+     * The timestamp of when this emoji was created, or null for unicode emoji.
+     * @var int
+     */
     protected $createdTimestamp;
     
     /**
@@ -44,7 +81,7 @@ class Emoji extends ClientBase {
     function __construct(\CharlotteDunois\Yasmin\Client $client, ?\CharlotteDunois\Yasmin\Models\Guild $guild, array $emoji) {
         parent::__construct($client);
         
-        $this->id = (!empty($emoji['id']) ? ((int) $emoji['id']) : null);
+        $this->id = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($emoji['id'] ?? null), 'int');
         $this->createdTimestamp = ($this->id ? ((int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp) : null);
         
         $this->guild = ($this->id ? $guild : null);
@@ -79,12 +116,8 @@ class Emoji extends ClientBase {
                 
                 return \rawurlencode($this->name);
             break;
-            case 'url':
-                if($this->id !== null) {
-                    return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['emojis'], $this->id, ($this->animated ? 'gif' : 'png'));
-                }
-                
-                return null;
+            case 'url': // TODO: DEPRECATED
+                return $this->getImageURL();
             break;
         }
         
@@ -186,6 +219,19 @@ class Emoji extends ClientBase {
     }
     
     /**
+     * Get the image URL of the custom emoji.
+     * @return string
+     * @throws \BadMethodCallException  Throws on unicode emojis.
+     */
+    function getImageURL() {
+        if($this->id === null) {
+            throw new \BadMethodCallException('Unable to get image url of a non-guild emoji');
+        }
+        
+        return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['emojis'], $this->id, ($this->animated ? 'gif' : 'png'));
+    }
+    
+    /**
      * Removes a role from the list of roles that can use this emoji. Resolves with $this.
      * @param \CharlotteDunois\Yasmin\Models\Role|string  $role
      * @return \React\Promise\ExtendedPromiseInterface
@@ -262,7 +308,7 @@ class Emoji extends ClientBase {
      * @internal
      */
     function _patch(array $emoji) {
-        $this->name = $emoji['name'];
+        $this->name = (string) $emoji['name'];
         $this->user = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user']) : null);
         $this->animated = (bool) ($emoji['animated'] ?? false);
         $this->managed = (bool) ($emoji['managed'] ?? false);

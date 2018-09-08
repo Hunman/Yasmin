@@ -19,7 +19,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int                                       $position               The channel position.
  * @property \CharlotteDunois\Yasmin\Utils\Collection  $permissionOverwrites   A collection of PermissionOverwrite instances.
  *
- * @property \CharlotteDunois\Yasmin\Utils\Collection  $children               Returns all channels which are childrens of this category.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection  $children               DEPRECATED: Returns all channels which are childrens of this category.
  * @property \DateTime                                 $createdAt              The DateTime instance of createdTimestamp.
  */
 class CategoryChannel extends ClientBase
@@ -27,14 +27,46 @@ class CategoryChannel extends ClientBase
                 \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait;
     
+    /**
+     * The guild this category channel belongs to.
+     * @var \CharlotteDunois\Yasmin\Models\Guild
+     */
     protected $guild;
     
+    /**
+     * The ID of the channel.
+     * @var string
+     */
     protected $id;
+    
+    /**
+     * The channel type.
+     * @var string
+     */
     protected $type;
+    
+    /**
+     * The channel name.
+     * @var string
+     */
     protected $name;
+    
+    /**
+     * The channel position.
+     * @var int
+     */
     protected $position;
+    
+    /**
+     * A collection of PermissionOverwrite instances.
+     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     */
     protected $permissionOverwrites;
     
+    /**
+     * The timestamp of when this channel was created.
+     * @var int
+     */
     protected $createdTimestamp;
     
     /**
@@ -64,10 +96,8 @@ class CategoryChannel extends ClientBase
         }
         
         switch($name) {
-            case 'children':
-                return $this->guild->channels->filter(function ($channel) {
-                    return $channel->parentID === $this->id;
-                });
+            case 'children': // TODO: DEPRECATED
+                return $this->getChildren();
             break;
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
@@ -78,12 +108,22 @@ class CategoryChannel extends ClientBase
     }
     
     /**
+     * Returns all channels which are childrens of this category.
+     * @return \CharlotteDunois\Yasmin\Utils\Collection
+     */
+    function getChildren() {
+        return $this->guild->channels->filter(function ($channel) {
+            return ($channel->parentID === $this->id);
+        });
+    }
+    
+    /**
      * @return void
      * @internal
      */
     function _patch(array $channel) {
-        $this->name = $channel['name'] ?? $this->name ?? '';
-        $this->position = $channel['position'] ?? $this->position ?? 0;
+        $this->name = (string) ($channel['name'] ?? $this->name ?? '');
+        $this->position = (int) ($channel['position'] ?? $this->position ?? 0);
         
         if(isset($channel['permission_overwrites'])) {
             $this->permissionOverwrites->clear();

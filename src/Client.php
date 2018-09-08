@@ -28,7 +28,7 @@ namespace CharlotteDunois\Yasmin;
  * @method removeAllListeners($event = null)                   Remove all listeners from an event (or all listeners).
  */
 class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializable {
-    use \CharlotteDunois\Events\EventEmitterTrait;
+    use \CharlotteDunois\Events\EventEmitterErrorTrait;
     
     /**
      * The version of Yasmin.
@@ -658,7 +658,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
                     );
                     
                     if($role['name'] === '@everyone') {
-                        $data['roles'][0] = $data['roles'];
+                        $data['roles'][0] = $role;
                     } else {
                         $data['roles'][] = $role;
                         $rolemap[$role['name']] = $roleint++;
