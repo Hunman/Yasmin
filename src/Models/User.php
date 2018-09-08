@@ -88,6 +88,10 @@ class User extends ClientBase {
      */
     protected $createdTimestamp;
     
+    /**
+     * Whether the user fetched this user.
+     * @var bool
+     */
     protected $userFetched = false;
     
     /**
