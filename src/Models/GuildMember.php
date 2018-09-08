@@ -366,7 +366,7 @@ class GuildMember extends ClientBase {
             return false;
         }
         
-        return ($member->highestRole->comparePositionTo($this->highestRole) > 0);
+        return ($member->getHighestRole()->comparePositionTo($this->getHighestRole()) > 0);
     }
     
     /**
@@ -383,7 +383,7 @@ class GuildMember extends ClientBase {
             return false;
         }
         
-        return ($member->highestRole->comparePositionTo($this->highestRole) > 0);
+        return ($member->getHighestRole()->comparePositionTo($this->getHighestRole()) > 0);
     }
     
     /**

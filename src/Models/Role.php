@@ -273,7 +273,7 @@ class Role extends ClientBase {
             return false;
         }
         
-        return ($member->highestRole->comparePositionTo($this) > 0);
+        return ($member->getHighestRole()->comparePositionTo($this) > 0);
     }
     
     /**

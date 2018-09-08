@@ -78,7 +78,7 @@ class MessageActivity extends ClientBase {
         switch($name) {
             case 'activity':
                 if($this->user) {
-                    $presence = $this->user->presence;
+                    $presence = $this->user->getPresence();
                     if($presence !== null && $presence->activity !== null) {
                         return $presence->activity;
                     }
