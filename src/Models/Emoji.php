@@ -24,7 +24,6 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
  * @property string                                               $identifier         The identifier for the emoji.
- * @property string                                               $url                DEPRECATED: The URL to the emoji image.
  */
 class Emoji extends ClientBase {
     /**
@@ -115,9 +114,6 @@ class Emoji extends ClientBase {
                 }
                 
                 return \rawurlencode($this->name);
-            break;
-            case 'url': // TODO: DEPRECATED
-                return $this->getImageURL();
             break;
         }
         

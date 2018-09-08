@@ -26,9 +26,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface  $messages               The storage with all cached messages.
  *
  * @property \DateTime                                            $createdAt              The DateTime instance of createdTimestamp.
- * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage            The last message, or null.
  * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null  $parent                 Returns the channel's parent, or null.
- * @property bool|null                                            $permissionsLocked      If the permissionOverwrites match the parent channel, or null if no parent.
  */
 class TextChannel extends ClientBase
     implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
@@ -138,14 +136,8 @@ class TextChannel extends ClientBase
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
-            case 'lastMessage': // TODO: DEPRECATED
-                return $this->getLastMessage();
-            break;
             case 'parent':
                 return $this->guild->channels->get($this->parentID);
-            break;
-            case 'permissionsLocked': // TODO: DEPRECATED
-                return $this->isPermissionsLocked();
             break;
         }
         
