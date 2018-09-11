@@ -24,6 +24,7 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
  * @property string                                               $identifier         The identifier for the emoji.
+ * @property int|string                                           $uid                The used identifier in the system (ID or name, that is).
  */
 class Emoji extends ClientBase {
     /**
@@ -114,6 +115,9 @@ class Emoji extends ClientBase {
                 }
                 
                 return \rawurlencode($this->name);
+            break;
+            case 'uid':
+                return ($this->id ?? $this->name);
             break;
         }
         
@@ -314,11 +318,13 @@ class Emoji extends ClientBase {
             $this->roles->clear();
             
             foreach($emoji['roles'] as $role) {
-                $r = $this->guild->roles->get($role['id']);
-                $this->roles->set($r->id, $r);
+                if($this->guild->roles->has($role['id'])) {
+                    $r = $this->guild->roles->get($role['id']);
+                    $this->roles->set($r->id, $r);
+                }
             }
         }
         
-        $this->client->emojis->set(($this->id ?? $this->name), $this);
+        $this->client->emojis->set($this->uid, $this);
     }
 }
