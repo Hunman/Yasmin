@@ -41,7 +41,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property bool                                                            $embedEnabled                 Whether the guild is embeddable or not (e.g. widget).
  * @property int|null                                                        $embedChannelID               The ID of the embed channel, or null.
  * @property bool                                                            $widgetEnabled                Whether the guild widget is enabled or not.
- * @property înt|null                                                        $widgetChannelID              The ID of the widget channel, or null.
+ * @property int|null                                                        $widgetChannelID              The ID of the widget channel, or null.
  *
  * @property \CharlotteDunois\Yasmin\Models\VoiceChannel|null                $afkChannel                   The guild's afk channel, or null.
  * @property \DateTime                                                       $createdAt                    The DateTime instance of createdTimestamp.
