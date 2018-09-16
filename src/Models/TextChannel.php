@@ -26,7 +26,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface  $messages               The storage with all cached messages.
  *
  * @property \DateTime                                                   $createdAt              The DateTime instance of createdTimestamp.
- * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null         $parent                 Returns the channel's parent, or null.
+ * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null         $parent                 The channel's parent, or null.
  */
 class TextChannel extends ClientBase
     implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
