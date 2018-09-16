@@ -30,7 +30,7 @@ final class Channel {
                 'create' => 'channels/%d/messages/%d/reactions/%s/@me',
                 'delete' => 'channels/%d/messages/%d/reactions/%s/%s',
                 'get' => 'channels/%d/messages/%d/reactions/%d',
-                'deleteAll' => 'channels/%d/messages/%d/reactions',
+                'deleteAll' => 'channels/%d/messages/%d/reactions'
             ),
             'edit' => 'channels/%d/messages/%d',
             'delete' => 'channels/%d/messages/%d',
@@ -116,12 +116,12 @@ final class Channel {
     
     function createMessageReaction(int $channelid, int $messageid, string $emoji) {
         $url = \CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(self::ENDPOINTS['messages']['reactions']['create'], $channelid, $messageid, $emoji);
-        return $this->api->makeRequest('PUT', $url, array());
+        return $this->api->makeRequest('PUT', $url, array('reactionRatelimit' => true));
     }
     
     function deleteMessageReaction(int $channelid, int $messageid, string $emoji, string $user) {
         $url = \CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(self::ENDPOINTS['messages']['reactions']['delete'], $channelid, $messageid, $emoji, $user);
-        return $this->api->makeRequest('DELETE', $url, array());
+        return $this->api->makeRequest('DELETE', $url, array('reactionRatelimit' => true));
     }
     
     function getMessageReactions(int $channelid, int $messageid, string $emoji, array $querystring = array()) {

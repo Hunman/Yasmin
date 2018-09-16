@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildMemberUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -36,7 +45,7 @@ class GuildMemberUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
                 }
                 
                 $guildmember->_patch($data);
-                $this->client->emit('guildMemberUpdate', $guildmember, $oldMember);
+                $this->client->queuedEmit('guildMemberUpdate', $guildmember, $oldMember);
             } else {
                 $guild->fetchMember($data['user']['id'])->done();
             }

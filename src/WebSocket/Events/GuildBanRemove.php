@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildBanRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -32,7 +36,7 @@ class GuildBanRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterf
             }
         
             $user->done(function (\CharlotteDunois\Yasmin\Models\User $user) use ($guild) {
-                $this->client->emit('guildBanRemove', $guild, $user);
+                $this->client->queuedEmit('guildBanRemove', $guild, $user);
             }, array($this->client, 'handlePromiseRejection'));
         }
     }

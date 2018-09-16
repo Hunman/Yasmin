@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageDeleteBulk implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -38,11 +42,11 @@ class MessageDeleteBulk implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
             }
             
             if($messages->count() > 0) {
-                $this->client->emit('messageDeleteBulk', $messages);
+                $this->client->queuedEmit('messageDeleteBulk', $messages);
             }
             
             if(\count($messagesRaw) > 0) {
-                $this->client->emit('messageDeleteBulkRaw', $channel, $messagesRaw);
+                $this->client->queuedEmit('messageDeleteBulkRaw', $channel, $messagesRaw);
             }
         }
     }

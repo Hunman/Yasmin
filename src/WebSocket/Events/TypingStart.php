@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -23,7 +27,7 @@ class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $user = $this->client->users->get($data['user_id']);
             if(!$user) {
                 $user = $this->client->fetchUser($data['user_id']);
@@ -39,7 +43,7 @@ class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
                 }
                 
                 if($channel->_updateTyping($user, $data['timestamp'])) {
-                    $this->client->emit('typingStart', $channel, $user);
+                    $this->client->queuedEmit('typingStart', $channel, $user);
                 }
             }, array($this->client, 'handlePromiseRejection'));
         }

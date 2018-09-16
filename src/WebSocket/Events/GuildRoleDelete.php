@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildRoleDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -27,7 +31,7 @@ class GuildRoleDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
             $role = $guild->roles->get($data['role_id']);
             if($role) {
                 $guild->roles->delete($role->id);
-                $this->client->emit('roleDelete', $role);
+                $this->client->queuedEmit('roleDelete', $role);
             }
         }
     }

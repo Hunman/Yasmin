@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildMemberAdd implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -25,7 +29,7 @@ class GuildMemberAdd implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterf
         $guild = $this->client->guilds->get($data['guild_id']);
         if($guild) {
             $guildmember = $guild->_addMember($data);
-            $this->client->emit('guildMemberAdd', $guildmember);
+            $this->client->queuedEmit('guildMemberAdd', $guildmember);
         }
     }
 }

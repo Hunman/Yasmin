@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -27,7 +36,7 @@ class MessageUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $message = $channel->messages->get($data['id']);
             if($message) {
                 // Minor bug in Discord - Event gets emitted when a message gets updated (not edited!) when additional data is available (e.g. image dimensions)
@@ -41,10 +50,10 @@ class MessageUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
                 $message->_patch($data);
                 
                 if($edited) {
-                    $this->client->emit('messageUpdate', $message, $oldMessage);
+                    $this->client->queuedEmit('messageUpdate', $message, $oldMessage);
                 }
             } else {
-                $this->client->emit('messageUpdateRaw', $channel, $data);
+                $this->client->queuedEmit('messageUpdateRaw', $channel, $data);
             }
         }
     }

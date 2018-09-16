@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildMemberRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -26,7 +30,7 @@ class GuildMemberRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
         if($guild) {
             $guildmember = $guild->_removeMember($data['user']['id']);
             if($guildmember) {
-                $this->client->emit('guildMemberRemove', $guildmember);
+                $this->client->queuedEmit('guildMemberRemove', $guildmember);
             }
         }
     }

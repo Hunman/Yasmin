@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class UserUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -35,7 +44,7 @@ class UserUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface 
             
             $user->_patch($data);
             
-            $this->client->emit('userUpdate', $user, $oldUser);
+            $this->client->queuedEmit('userUpdate', $user, $oldUser);
         }
     }
 }

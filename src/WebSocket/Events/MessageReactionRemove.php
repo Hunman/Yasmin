@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageReactionRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -23,7 +27,7 @@ class MessageReactionRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEven
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $id = (!empty($data['emoji']['id']) ? ((int) $data['emoji']['id']) : $data['emoji']['name']);
             
             $message = $channel->messages->get($data['message_id']);
@@ -72,7 +76,7 @@ class MessageReactionRemove implements \CharlotteDunois\Yasmin\Interfaces\WSEven
                         $message->reactions->delete(($reaction->emoji->id ?? $reaction->emoji->name));
                     }
                     
-                    $this->client->emit('messageReactionRemove', $reaction, $user);
+                    $this->client->queuedEmit('messageReactionRemove', $reaction, $user);
                 }, array($this->client, 'handlePromiseRejection'));
             }, function () {
                 // Don't handle it

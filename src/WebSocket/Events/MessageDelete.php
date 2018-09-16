@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -27,9 +31,9 @@ class MessageDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
             $message = $channel->messages->get($data['id']);
             if($message) {
                 $channel->messages->delete($message->id);
-                $this->client->emit('messageDelete', $message);
+                $this->client->queuedEmit('messageDelete', $message);
             } else {
-                $this->client->emit('messageDeleteRaw', $channel, ((int) $data['id']));
+                $this->client->queuedEmit('messageDeleteRaw', $channel, ((int) $data['id']));
             }
         }
     }

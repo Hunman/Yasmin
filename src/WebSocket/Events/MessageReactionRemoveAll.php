@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageReactionRemoveAll implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -23,7 +27,7 @@ class MessageReactionRemoveAll implements \CharlotteDunois\Yasmin\Interfaces\WSE
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $message = $channel->messages->get($data['message_id']);
             if($message) {
                 $message = \React\Promise\resolve($message);
@@ -33,7 +37,7 @@ class MessageReactionRemoveAll implements \CharlotteDunois\Yasmin\Interfaces\WSE
             
             $message->done(function (\CharlotteDunois\Yasmin\Models\Message $message) {
                 $message->reactions->clear();
-                $this->client->emit('messageReactionRemoveAll', $message);
+                $this->client->queuedEmit('messageReactionRemoveAll', $message);
             }, function () {
                 // Don't handle it
             });

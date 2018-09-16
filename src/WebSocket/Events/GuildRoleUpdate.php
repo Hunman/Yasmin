@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildRoleUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -36,10 +45,10 @@ class GuildRoleUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
                 }
                 
                 $role->_patch($data['role']);
-                $this->client->emit('roleUpdate', $role, $oldRole);
+                $this->client->queuedEmit('roleUpdate', $role, $oldRole);
             } else {
                 $role = $guild->roles->factory($data['role']);
-                $this->client->emit('roleCreate', $role);
+                $this->client->queuedEmit('roleCreate', $role);
             }
         }
     }

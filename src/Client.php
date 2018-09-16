@@ -12,20 +12,20 @@ namespace CharlotteDunois\Yasmin;
 /**
  * The client. What else do you expect this to say?
  *
- * @property \React\EventLoop\LoopInterface                  $loop       The event loop.
- * @property \CharlotteDunois\Yasmin\Models\ChannelStorage   $channels   Holds all cached channels, mapped by ID.
- * @property \CharlotteDunois\Yasmin\Models\EmojiStorage     $emojis     Holds all emojis, mapped by ID (custom emojis) and/or name (unicode emojis).
- * @property \CharlotteDunois\Yasmin\Models\GuildStorage     $guilds     Holds all guilds, mapped by ID.
- * @property \CharlotteDunois\Yasmin\Models\PresenceStorage  $presences  Holds all cached presences (latest ones), mapped by user ID.
- * @property \CharlotteDunois\Yasmin\Models\UserStorage      $users      Holds all cached users, mapped by ID.
- * @property int[]                                           $pings      The last 3 websocket pings of each shard.
- * @property \CharlotteDunois\Yasmin\Utils\Collection        $shards     Holds all shards, mapped by shard ID.
- * @property \CharlotteDunois\Yasmin\Models\ClientUser|null  $user       User that the client is logged in as. The instance gets created when the client turns ready.
+ * @property \React\EventLoop\LoopInterface                               $loop       The event loop.
+ * @property \CharlotteDunois\Yasmin\Interfaces\ChannelStorageInterface   $channels   Holds all cached channels, mapped by ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\EmojiStorageInterface     $emojis     Holds all emojis, mapped by ID (custom emojis) and/or name (unicode emojis).
+ * @property \CharlotteDunois\Yasmin\Interfaces\GuildStorageInterface     $guilds     Holds all guilds, mapped by ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\PresenceStorageInterface  $presences  Holds all cached presences (latest ones), mapped by user ID.
+ * @property \CharlotteDunois\Yasmin\Interfaces\UserStorageInterface      $users      Holds all cached users, mapped by ID.
+ * @property int[]                                                        $pings      The last 3 websocket pings of each shard.
+ * @property \CharlotteDunois\Yasmin\Utils\Collection                     $shards     Holds all shards, mapped by shard ID.
+ * @property \CharlotteDunois\Yasmin\Models\ClientUser|null               $user       User that the client is logged in as. The instance gets created when the client turns ready.
  *
- * @method on(string $event, callable $listener)               Attach a listener to an event. The method is from the trait - only for documentation purpose here.
- * @method once(string $event, callable $listener)             Attach a listener to an event, for exactly once. The method is from the trait - only for documentation purpose here.
- * @method removeListener(string $event, callable $listener)   Remove specified listener from an event. The method is from the trait - only for documentation purpose here.
- * @method removeAllListeners($event = null)                   Remove all listeners from an event (or all listeners).
+ * @method $this  on(string $event, callable $listener)               Attach a listener to an event. The method is from the trait - only for documentation purpose here.
+ * @method $this  once(string $event, callable $listener)             Attach a listener to an event, for exactly once. The method is from the trait - only for documentation purpose here.
+ * @method $this  removeListener(string $event, callable $listener)   Remove specified listener from an event. The method is from the trait - only for documentation purpose here.
+ * @method $this  removeAllListeners($event = null)                   Remove all listeners from an event (or all listeners).
  */
 class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializable {
     use \CharlotteDunois\Events\EventEmitterErrorTrait;
@@ -154,12 +154,14 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     protected $user;
     
     /**
+     * The API manager.
      * @var \CharlotteDunois\Yasmin\HTTP\APIManager
      * @internal
      */
     protected $api;
     
     /**
+     * The WS manager.
      * @var \CharlotteDunois\Yasmin\WebSocket\WSManager|null
      * @internal
      */
@@ -185,6 +187,13 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * @internal
      */
     protected $utils = array();
+    
+    /**
+     * Events queue, until client turns ready.
+     * @var array
+     * @internal
+     */
+    protected $eventsQueue = array();
     
     /**
      * What do you expect this to do? It makes a new Client instance. Available client options are as following (all are optional):
@@ -274,6 +283,12 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             $this->ws->on('ready', function () {
                 $this->readyTimestamp = \time();
                 $this->emit('ready');
+            });
+            
+            $this->ws->once('ready', function () {
+                while($ev = \array_shift($this->eventsQueue)) {
+                    $this->emit($ev[0], ...$ev[1]);
+                }
             });
         }
         
@@ -1003,7 +1018,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'http.ratelimitbucket.name' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\RatelimitBucketInterface,string_only',
             'http.requestErrorDelay' => 'integer|min:15',
             'http.requestMaxRetries' => 'integer|min:0',
-            'http.restTimeOffset' => 'integer',
+            'http.restTimeOffset' => 'integer|float',
             'ws.compression' => 'string',
             'ws.disabledEvents' => 'array:string',
             'ws.encoding' => 'string',
@@ -1011,14 +1026,14 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'ws.presence' => 'array',
             'ws.presenceUpdate.ignoreUnknownUsers' => 'boolean',
             'internal.api.instance' => 'class:CharlotteDunois\\Yasmin\\HTTP\\APIManager',
-            'internal.storages.channels' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.emojis' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.guilds' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.messages' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.members' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.presences' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.roles' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
-            'internal.storages.users' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\StorageInterface,string_only',
+            'internal.storages.channels' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\ChannelStorageInterface,string_only',
+            'internal.storages.emojis' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\EmojiStorageInterface,string_only',
+            'internal.storages.guilds' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\GuildStorageInterface,string_only',
+            'internal.storages.messages' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\MessageStorageInterface,string_only',
+            'internal.storages.members' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\GuildMemberStorageInterface,string_only',
+            'internal.storages.presences' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\PresenceStorageInterface,string_only',
+            'internal.storages.roles' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\RoleStorageInterface,string_only',
+            'internal.storages.users' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\UserStorageInterface,string_only',
             'internal.ws.instance' => 'class:CharlotteDunois\\Yasmin\\WebSocket\\WSManager'
         ));
         
@@ -1054,5 +1069,19 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
                 $this->options['internal.storages.'.$name] = $base;
             }
         }
+    }
+    
+    /**
+     * Puts events into a queue, if the client is not ready yet.
+     * @return void
+     * @internal
+     */
+    function queuedEmit(string $event, ...$args) {
+        if($this->readyTimestamp === null) {
+            $this->eventsQueue[] = array($event, $args);
+            return;
+        }
+        
+        return $this->emit($event, ...$args);
     }
 }

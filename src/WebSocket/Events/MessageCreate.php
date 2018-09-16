@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class MessageCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -23,7 +27,15 @@ class MessageCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
     
     function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
+            $user = $this->client->users->patch($data['author']);
+            
+            if(!empty($data['member']) && $channel->type === 'text' && !$channel->guild->members->has($user->id)) {
+                $member = $data['member'];
+                $member['user'] = $user->id;
+                $channel->guild->_addMember($member, true);
+            }
+            
             $message = $channel->_createMessage($data);
             
             if($message->guild && $message->mentions->users->count() > 0 && $message->mentions->users->count() > $message->mentions->members->count()) {
@@ -49,7 +61,7 @@ class MessageCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
                     });
                 }
                 
-                $this->client->emit('message', $message);
+                $this->client->queuedEmit('message', $message);
             }, array($this->client, 'handlePromiseRejection'));
         }
     }

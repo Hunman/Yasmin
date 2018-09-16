@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -30,7 +39,7 @@ class GuildUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
         if($guild) {
             if(($data['unavailable'] ?? false)) {
                 $guild->_patch(array('unavailable' => true));
-                $this->client->emit('guildUnavailable', $guild);
+                $this->client->queuedEmit('guildUnavailable', $guild);
                 return;
             }
             
@@ -41,7 +50,7 @@ class GuildUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
             
             $guild->_patch($data);
             
-            $this->client->emit('guildUpdate', $guild, $oldGuild);
+            $this->client->queuedEmit('guildUpdate', $guild, $oldGuild);
         }
     }
 }

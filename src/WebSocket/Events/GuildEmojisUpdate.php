@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildEmojisUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -43,7 +47,7 @@ class GuildEmojisUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
                 }
             }
             
-            $this->client->emit('guildEmojisUpdate', $guild);
+            $this->client->queuedEmit('guildEmojisUpdate', $guild);
         }
     }
 }

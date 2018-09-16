@@ -12,7 +12,7 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Presence Storage, which utilizes Collection.
  */
-class PresenceStorage extends Storage {
+class PresenceStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\PresenceStorageInterface {
     /**
      * Whether the presence cache is enabled.
      * @var bool
@@ -50,8 +50,8 @@ class PresenceStorage extends Storage {
     }
     
     /**
-     * Returns the item for a given key. If the key does not exist, null is returned.
-     * @param mixed  $key
+     * {@inheritdoc}
+     * @param string  $key
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      */
     function get($key) {
@@ -60,6 +60,8 @@ class PresenceStorage extends Storage {
     
     /**
      * {@inheritdoc}
+     * @param string                                   $key
+     * @param \CharlotteDunois\Yasmin\Models\Presence  $value
      * @return $this
      */
     function set($key, $value) {
@@ -77,6 +79,7 @@ class PresenceStorage extends Storage {
     
     /**
      * {@inheritdoc}
+     * @param string  $key
      * @return $this
      */
     function delete($key) {
@@ -93,6 +96,8 @@ class PresenceStorage extends Storage {
     }
     
     /**
+     * Factory to create presences.
+     * @param array  $data
      * @return \CharlotteDunois\Yasmin\Models\Presence
      * @internal
      */

@@ -11,6 +11,9 @@ namespace CharlotteDunois\Yasmin\Interfaces;
 
 /**
  * Something all textchannels (all text-based channels) implement. See TextChannelTrait for full comments.
+ *
+ * @method string                                                      getType()      The channel type. ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES})
+ * @method \CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface  getMessages()  The storage with all cached messages.
  */
 interface TextChannelInterface {
     /**
@@ -84,4 +87,19 @@ interface TextChannelInterface {
      * @return bool
      */
     function isTyping(\CharlotteDunois\Yasmin\Models\User $user);
+    
+    /**
+     * @param array  $message
+     * @return \CharlotteDunois\Yasmin\Models\Message
+     * @internal
+     */
+    function _createMessage(array $message);
+    
+    /**
+     * @param \CharlotteDunois\Yasmin\Models\User  $user
+     * @param int|null                             $timestamp
+     * @return boolean
+     * @internal
+     */
+    function _updateTyping(\CharlotteDunois\Yasmin\Models\User $user, ?int $timestamp = null);
 }

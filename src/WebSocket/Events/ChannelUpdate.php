@@ -15,7 +15,16 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
+    
+    /**
+     * Whether we do clones.
+     * @var bool
+     */
     protected $clones = false;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -49,7 +58,7 @@ class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
             }
             
             \React\Promise\all($prom)->done(function () use ($channel, $oldChannel) {
-                $this->client->emit('channelUpdate', $channel, $oldChannel);
+                $this->client->queuedEmit('channelUpdate', $channel, $oldChannel);
             }, array($this->client, 'handlePromiseRejection'));
         }
     }

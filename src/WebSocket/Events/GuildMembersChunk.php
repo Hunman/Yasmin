@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildMembersChunk implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -30,7 +34,7 @@ class GuildMembersChunk implements \CharlotteDunois\Yasmin\Interfaces\WSEventInt
                 $members->set($member->id, $member);
             }
             
-            $this->client->emit('guildMembersChunk', $guild, $members);
+            $this->client->queuedEmit('guildMembersChunk', $guild, $members);
         }
     }
 }

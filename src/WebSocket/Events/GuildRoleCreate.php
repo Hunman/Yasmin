@@ -15,6 +15,10 @@ namespace CharlotteDunois\Yasmin\WebSocket\Events;
  * @internal
  */
 class GuildRoleCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface {
+    /**
+     * The client.
+     * @var \CharlotteDunois\Yasmin\Client
+     */
     protected $client;
     
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\WebSocket\WSManager $wsmanager) {
@@ -25,7 +29,7 @@ class GuildRoleCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
         $guild = $this->client->guilds->get($data['guild_id']);
         if($guild) {
             $role = $guild->roles->factory($data['role']);
-            $this->client->emit('roleCreate', $role);
+            $this->client->queuedEmit('roleCreate', $role);
         }
     }
 }
