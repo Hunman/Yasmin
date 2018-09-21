@@ -24,10 +24,6 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int                                                  $createdTimestamp   The timestamp of when this user was created.
  *
  * @property \DateTime                                            $createdAt          An DateTime instance of the createdTimestamp.
- * @property int                                                  $defaultAvatar      DEPRECATED: The identifier of the default avatar for this user.
- * @property \CharlotteDunois\Yasmin\Models\DMChannel|null        $dmChannel          DEPRECATED: The DM channel for this user, if it exists, or null.
- * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage        DEPRECATED (with no replacement): The last message the user sent while the client was online, or null.
- * @property \CharlotteDunois\Yasmin\Models\Presence|null         $presence           DEPRECATED: The presence for this user, or null.
  * @property string                                               $tag                Username#Discriminator.
  */
 class User extends ClientBase {
