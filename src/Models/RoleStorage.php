@@ -48,6 +48,15 @@ class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     /**
      * {@inheritdoc}
      * @param int  $key
+     * @return bool
+     */
+    function has($key) {
+        return parent::has($key);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Role|null
      */
     function get($key) {

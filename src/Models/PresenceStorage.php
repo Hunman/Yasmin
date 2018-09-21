@@ -52,6 +52,15 @@ class PresenceStorage extends Storage implements \CharlotteDunois\Yasmin\Interfa
     /**
      * {@inheritdoc}
      * @param int  $key
+     * @return bool
+     */
+    function has($key) {
+        return parent::has($key);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      */
     function get($key) {

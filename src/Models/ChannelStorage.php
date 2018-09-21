@@ -53,6 +53,15 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     /**
      * {@inheritdoc}
      * @param int  $key
+     * @return bool
+     */
+    function has($key) {
+        return parent::has($key);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|null
      */
     function get($key) {
