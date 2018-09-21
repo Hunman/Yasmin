@@ -52,7 +52,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|null
      */
     function get($key) {
@@ -61,7 +61,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string                                               $key
+     * @param int                                                  $key
      * @param \CharlotteDunois\Yasmin\Interfaces\ChannelInterface  $value
      * @return $this
      */
@@ -76,7 +76,7 @@ class ChannelStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

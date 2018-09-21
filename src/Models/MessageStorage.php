@@ -62,7 +62,7 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Message|null
      */
     function get($key) {
@@ -71,7 +71,7 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string                                  $key
+     * @param int                                     $key
      * @param \CharlotteDunois\Yasmin\Models\Message  $value
      * @return $this
      */

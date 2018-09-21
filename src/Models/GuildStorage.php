@@ -33,7 +33,7 @@ class GuildStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Guild|null
      */
     function get($key) {
@@ -42,7 +42,7 @@ class GuildStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * {@inheritdoc}
-     * @param string                                $key
+     * @param int                                   $key
      * @param \CharlotteDunois\Yasmin\Models\Guild  $value
      * @return $this
      */
@@ -53,7 +53,7 @@ class GuildStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

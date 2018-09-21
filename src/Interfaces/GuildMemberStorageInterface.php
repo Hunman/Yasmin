@@ -21,7 +21,7 @@ interface GuildMemberStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface GuildMemberStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to a guildmember.
-     * @param \CharlotteDunois\Yasmin\Models\GuildMember|\CharlotteDunois\Yasmin\Models\User|string|int  $guildmember  string/int = user ID
+     * @param \CharlotteDunois\Yasmin\Models\GuildMember|\CharlotteDunois\Yasmin\Models\User|int|string  $guildmember  int/string = user ID
      * @return \CharlotteDunois\Yasmin\Models\GuildMember
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface GuildMemberStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\GuildMember|null
      * @throws \InvalidArgumentException
     */
@@ -67,7 +67,7 @@ interface GuildMemberStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                                      $key
+     * @param int                                         $key
      * @param \CharlotteDunois\Yasmin\Models\GuildMember  $value
      * @return $this
      * @throws \InvalidArgumentException

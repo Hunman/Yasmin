@@ -21,7 +21,7 @@ interface EmojiStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface EmojiStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to an emoji.
-     * @param \CharlotteDunois\Yasmin\Models\Emoji|\CharlotteDunois\Yasmin\Models\MessageReaction|string|int  $emoji  string/int = emoji ID
+     * @param \CharlotteDunois\Yasmin\Models\Emoji|\CharlotteDunois\Yasmin\Models\MessageReaction|int|string  $emoji  int/string = emoji ID
      * @return \CharlotteDunois\Yasmin\Models\Emoji
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface EmojiStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Emoji|null
      * @throws \InvalidArgumentException
     */
@@ -67,7 +67,7 @@ interface EmojiStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                                $key
+     * @param int                                   $key
      * @param \CharlotteDunois\Yasmin\Models\Emoji  $value
      * @return $this
      * @throws \InvalidArgumentException

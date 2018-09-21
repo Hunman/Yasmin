@@ -21,7 +21,7 @@ interface UserStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface UserStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to an user.
-     * @param \CharlotteDunois\Yasmin\Models\User|\CharlotteDunois\Yasmin\Models\GuildMember|string|int  $user  string/int = user ID
+     * @param \CharlotteDunois\Yasmin\Models\User|\CharlotteDunois\Yasmin\Models\GuildMember|int|string  $user  int/string = user ID
      * @return \CharlotteDunois\Yasmin\Models\User
      * @throws \InvalidArgumentException
      */
@@ -66,7 +66,7 @@ interface UserStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\User|null
      * @throws \InvalidArgumentException
     */
@@ -74,7 +74,7 @@ interface UserStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                               $key
+     * @param int                                  $key
      * @param \CharlotteDunois\Yasmin\Models\User  $value
      * @return $this
      * @throws \InvalidArgumentException

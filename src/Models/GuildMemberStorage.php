@@ -51,7 +51,7 @@ class GuildMemberStorage extends Storage implements \CharlotteDunois\Yasmin\Inte
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\GuildMember|null
      */
     function get($key) {
@@ -60,7 +60,7 @@ class GuildMemberStorage extends Storage implements \CharlotteDunois\Yasmin\Inte
     
     /**
      * {@inheritdoc}
-     * @param string                                      $key
+     * @param int                                         $key
      * @param \CharlotteDunois\Yasmin\Models\GuildMember  $value
      * @return $this
      */

@@ -21,7 +21,7 @@ interface RoleStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface RoleStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to a Role.
-     * @param \CharlotteDunois\Yasmin\Models\Role|string|int  $role  string/int = role ID
+     * @param \CharlotteDunois\Yasmin\Models\Role|int|string  $role  int/string = role ID
      * @return \CharlotteDunois\Yasmin\Models\Role
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface RoleStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Role|null
      * @throws \InvalidArgumentException
     */
@@ -67,7 +67,7 @@ interface RoleStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                               $key
+     * @param int                                  $key
      * @param \CharlotteDunois\Yasmin\Models\Role  $value
      * @return $this
      * @throws \InvalidArgumentException

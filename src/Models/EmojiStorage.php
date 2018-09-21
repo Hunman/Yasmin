@@ -51,7 +51,16 @@ class EmojiStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * {@inheritdoc}
-     * @param string                                $key
+     * @param int  $key
+     * @return \CharlotteDunois\Yasmin\Models\Emoji|null
+     */
+    function get($key) {
+        return parent::get($key);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @param int                                   $key
      * @param \CharlotteDunois\Yasmin\Models\Emoji  $value
      * @return $this
      */
@@ -66,7 +75,7 @@ class EmojiStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

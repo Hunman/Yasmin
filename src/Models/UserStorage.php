@@ -74,7 +74,7 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\User|null
      */
     function get($key) {
@@ -83,7 +83,7 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * {@inheritdoc}
-     * @param string                               $key
+     * @param int                                  $key
      * @param \CharlotteDunois\Yasmin\Models\User  $value
      * @return $this
      */
@@ -98,7 +98,7 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

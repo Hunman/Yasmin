@@ -21,7 +21,7 @@ interface ChannelStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface ChannelStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to a channel.
-     * @param \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|string|int  $channel  string/int = channel ID
+     * @param \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|int|string  $channel  int/string = channel ID
      * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface ChannelStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Interfaces\ChannelInterface|null
      * @throws \InvalidArgumentException
     */
@@ -67,7 +67,7 @@ interface ChannelStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                                               $key
+     * @param int                                                  $key
      * @param \CharlotteDunois\Yasmin\Interfaces\ChannelInterface  $value
      * @return $this
      * @throws \InvalidArgumentException

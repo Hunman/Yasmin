@@ -51,7 +51,7 @@ class PresenceStorage extends Storage implements \CharlotteDunois\Yasmin\Interfa
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      */
     function get($key) {
@@ -60,7 +60,7 @@ class PresenceStorage extends Storage implements \CharlotteDunois\Yasmin\Interfa
     
     /**
      * {@inheritdoc}
-     * @param string                                   $key
+     * @param int                                      $key
      * @param \CharlotteDunois\Yasmin\Models\Presence  $value
      * @return $this
      */
@@ -79,7 +79,7 @@ class PresenceStorage extends Storage implements \CharlotteDunois\Yasmin\Interfa
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

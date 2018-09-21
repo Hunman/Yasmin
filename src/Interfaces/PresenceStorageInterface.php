@@ -21,7 +21,7 @@ interface PresenceStorageInterface extends StorageInterface {
     
     /**
      * Fetch the key from the current element. From Iterator interface.
-     * @return string
+     * @return int
      */
     function key();
     
@@ -51,7 +51,7 @@ interface PresenceStorageInterface extends StorageInterface {
     
     /**
      * Resolves given data to a presence.
-     * @param \CharlotteDunois\Yasmin\Models\Presence|\CharlotteDunois\Yasmin\Models\User|string|int  $presence  string/int = user ID
+     * @param \CharlotteDunois\Yasmin\Models\Presence|\CharlotteDunois\Yasmin\Models\User|int|string  $presence  int/string = user ID
      * @return \CharlotteDunois\Yasmin\Models\Presence
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface PresenceStorageInterface extends StorageInterface {
     
     /**
      * Returns the item at a given key. If the key does not exist, null is returned.
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      * @throws \InvalidArgumentException
     */
@@ -67,7 +67,7 @@ interface PresenceStorageInterface extends StorageInterface {
     
     /**
      * Sets a key-value pair.
-     * @param string                                   $key
+     * @param int                                      $key
      * @param \CharlotteDunois\Yasmin\Models\Presence  $value
      * @return $this
      * @throws \InvalidArgumentException

@@ -47,7 +47,7 @@ class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return \CharlotteDunois\Yasmin\Models\Role|null
      */
     function get($key) {
@@ -56,7 +56,7 @@ class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
     
     /**
      * {@inheritdoc}
-     * @param string                               $key
+     * @param int                                  $key
      * @param \CharlotteDunois\Yasmin\Models\Role  $value
      * @return $this
      */
