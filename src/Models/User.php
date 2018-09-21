@@ -147,7 +147,7 @@ class User extends ClientBase {
      */
     function createDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->client->get()->channels->first(function ($channel) {
+            $channel = $this->client->channels->first(function ($channel) {
                 return ($channel->type === 'dm' && $channel->isRecipient($this));
             });
             
@@ -155,8 +155,8 @@ class User extends ClientBase {
                 return $resolve($channel);
             }
             
-            $this->client->get()->apimanager()->endpoints->user->createUserDM($this->id)->done(function ($data) use ($resolve) {
-                $channel = $this->client->get()->channels->factory($data);
+            $this->client->apimanager()->endpoints->user->createUserDM($this->id)->done(function ($data) use ($resolve) {
+                $channel = $this->client->channels->factory($data);
                 $resolve($channel);
             }, $reject);
         }));
@@ -168,7 +168,7 @@ class User extends ClientBase {
      */
     function deleteDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->client->get()->channels->first(function ($channel) {
+            $channel = $this->client->channels->first(function ($channel) {
                 return ($channel->type === 'dm' && $channel->isRecipient($this));
             });
             
@@ -176,8 +176,8 @@ class User extends ClientBase {
                 return $resolve($this);
             }
             
-            $this->client->get()->apimanager()->endpoints->channel->deleteChannel($channel->id)->done(function () use ($channel, $resolve) {
-                $this->client->get()->channels->delete($channel->id);
+            $this->client->apimanager()->endpoints->channel->deleteChannel($channel->id)->done(function () use ($channel, $resolve) {
+                $this->client->channels->delete($channel->id);
                 $resolve($this);
             }, $reject);
         }));
@@ -243,14 +243,14 @@ class User extends ClientBase {
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      */
     function getPresence() {
-        if($this->client->get()->presences->has($this->id)) {
-            return $this->client->get()->presences->get($this->id);
+        if($this->client->presences->has($this->id)) {
+            return $this->client->presences->get($this->id);
         }
         
-        foreach($this->client->get()->guilds as $guild) {
+        foreach($this->client->guilds as $guild) {
             if($guild->presences->has($this->id)) {
                 $presence = $guild->presences->get($this->id);
-                $this->client->get()->presences->set($this->id, $presence);
+                $this->client->presences->set($this->id, $presence);
                 
                 return $presence;
             }
@@ -267,10 +267,10 @@ class User extends ClientBase {
      */
     function fetchUserConnections(string $accessToken) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($accessToken) {
-            $this->client->get()->apimanager()->endpoints->user->getUserConnections($accessToken)->done(function ($data) use ($resolve) {
+            $this->client->apimanager()->endpoints->user->getUserConnections($accessToken)->done(function ($data) use ($resolve) {
                 $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
                 foreach($data as $conn) {
-                    $connection = new \CharlotteDunois\Yasmin\Models\UserConnection($this->client->get(), $this, $conn);
+                    $connection = new \CharlotteDunois\Yasmin\Models\UserConnection($this->client, $this, $conn);
                     $collect->set($connection->id, $connection);
                 }
                 
