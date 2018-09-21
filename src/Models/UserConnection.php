@@ -54,7 +54,7 @@ class UserConnection extends ClientBase {
      */
     function __construct(\CharlotteDunois\Yasmin\Client $client, \CharlotteDunois\Yasmin\Models\User $user, array $connection) {
         parent::__construct($client);
-        $this->userID = $user->id;
+        $this->user = $user;
         
         $this->id = (string) $connection['id'];
         $this->name = (string) $connection['name'];
@@ -65,10 +65,6 @@ class UserConnection extends ClientBase {
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
-        }
-        
-        if($name === 'user') {
-            return $this->client->users->get($this->userID);
         }
         
         return parent::__get($name);

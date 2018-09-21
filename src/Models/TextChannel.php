@@ -27,7 +27,7 @@ namespace CharlotteDunois\Yasmin\Models;
  *
  * @property \DateTime                                                   $createdAt              The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\Message|null                 $lastMessage            DEPRECATED: The last message, or null.
- * @property \CharlotteDunois\Yasmin\Models\Guild|null                   $guild                  The associated guild.
+ * @property \CharlotteDunois\Yasmin\Models\Guild|null                   $guild                  The associated guild, or null.
  * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null         $parent                 The channel's parent, or null.
  * @property bool|null                                                   $permissionsLocked      DEPRECATED: If the permissionOverwrites match the parent channel, or null if no parent.
  */

@@ -59,8 +59,6 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
             $this->client->cancelTimer($this->timer);
             $this->timer = null;
         }
-        
-        parent::__destruct();
     }
     
     /**

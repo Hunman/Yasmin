@@ -32,8 +32,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\MessageActivity|null           $activity           The activity attached to this message. Sent with Rich Presence-related chat embeds.
  * @property \CharlotteDunois\Yasmin\Models\MessageApplication|null        $application        The application attached to this message. Sent with Rich Presence-related chat embeds.
  *
- * @property \CharlotteDunois\Yasmin\Models\User|null                      $author             The user that created the message.
- * @property \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface|null  $channel            The channel this message was created in.
+ * @property \CharlotteDunois\Yasmin\Models\User|null                      $author             The user that created the message, or null.
+ * @property \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface|null  $channel            The channel this message was created in, or null.
  * @property \DateTime                                                     $createdAt          An DateTime instance of the createdTimestamp.
  * @property \DateTime|null                                                $editedAt           An DateTime instance of the editedTimestamp, or null.
  * @property bool                                                          $deletable          DEPRECATED (with no replacement): Whether the client user can delete the message.

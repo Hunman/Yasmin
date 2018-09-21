@@ -20,7 +20,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $deny       The denied Permissions instance.
  *
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null                         $channel    The channel this Permission Overwrite belongs to, or null.
- * @property \CharlotteDunois\Yasmin\Models\Guild                                                  $guild      The guild this Permission Overwrite belongs to.
+ * @property \CharlotteDunois\Yasmin\Models\Guild                                                  $guild      The guild this Permission Overwrite belongs to, or null.
  */
 class PermissionOverwrite extends ClientBase {
     /**

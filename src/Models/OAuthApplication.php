@@ -19,8 +19,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string[]|null                                        $rpcOrigins           An array of RPC origin url strings, if RPC is enabled, or null.
  * @property bool                                                 $botPublic            Whether the bot is public.
  * @property bool                                                 $botRequireCodeGrant  Whether the bot requires a code grant (full OAuth flow).
- *
  * @property \CharlotteDunois\Yasmin\Models\User|null             $owner                The User instance of the owner, or null.
+ *
  */
 class OAuthApplication extends ClientBase {
     /**
@@ -84,7 +84,7 @@ class OAuthApplication extends ClientBase {
         $this->rpcOrigins = $application['rpc_origins'] ?? null;
         $this->botPublic = (bool) $application['bot_public'];
         $this->botRequireCodeGrant = (bool) $application['bot_require_code_grant'];
-        $this->ownerID = (!empty($application['owner']) ? $this->client->users->patch($application['owner'])->id : null);
+        $this->owner = (!empty($application['owner']) ? $this->client->users->patch($application['owner']) : null);
     }
     
     /**
@@ -96,10 +96,6 @@ class OAuthApplication extends ClientBase {
     function __get($name) {
         if(\property_exists($this, $name)) {
             return $this->$name;
-        }
-        
-        if($name === 'owner') {
-            return $this->client->users->get($this->ownerID);
         }
         
         return parent::__get($name);
