@@ -156,6 +156,9 @@ class GuildMember extends ClientBase {
             case 'displayName':
                 return ($this->nickname ?? $this->user->username);
             break;
+            case 'guild':
+                return $this->client->guilds->get($this->guildID);
+            break;
             case 'highestRole': // TODO: DEPRECATED
                 return $this->getHighestRole();
             break;
