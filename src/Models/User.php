@@ -128,32 +128,6 @@ class User extends ClientBase {
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
-            case 'defaultAvatar': // TODO: DEPRECATED
-                return ($this->discriminator % 5);
-            break;
-            case 'dmChannel': // TODO: DEPRECATED
-                $channel = $this->client->get()->channels->first(function ($channel) {
-                    return ($channel->type === 'dm' && $channel->isRecipient($this));
-                });
-                
-                return $channel;
-            break;
-            case 'lastMessage': // TODO: DEPRECATED
-                if($this->lastMessageID !== null) {
-                    $channel = $this->client->get()->channels->first(function ($channel) {
-                        return ($channel->type === 'text' && $channel->messages->has($this->lastMessageID));
-                    });
-                    
-                    if($channel) {
-                        return $channel->messages->get($this->lastMessageID);
-                    }
-                }
-                
-                return null;
-            break;
-            case 'presence': // TODO: DEPRECATED
-                return $this->getPresence();
-            break;
             case 'tag':
                 return $this->username.'#'.$this->discriminator;
             break;
