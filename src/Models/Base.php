@@ -192,10 +192,6 @@ abstract class Base implements \JsonSerializable, \Serializable {
      */
     function _markForDelete() {
         foreach($this as $key => $val) {
-            if($val instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
-                $val->clear();
-            }
-            
             $this->$key = null;
             unset($val);
         }
