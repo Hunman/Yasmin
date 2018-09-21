@@ -59,7 +59,7 @@ interface ChannelStorageInterface extends StorageInterface {
     
     /**
      * Determines if a given key exists in the collection.
-     * @param string  $key
+     * @param int  $key
      * @return bool
      * @throws \InvalidArgumentException
     */
