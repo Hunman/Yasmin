@@ -24,8 +24,8 @@ class GuildStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
             return $guild;
         }
         
-        if($this->has($guild)) {
-            return $this->get($guild);
+        if(parent::has($guild)) {
+            return parent::get($guild);
         }
         
         throw new \InvalidArgumentException('Unable to resolve unknown guild');
@@ -82,8 +82,8 @@ class GuildStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces
      * @internal
      */
     function factory(array $data, ?int $shardID = null) {
-        if($this->has($data['id'])) {
-            $guild = $this->get($data['id']);
+        if(parent::has($data['id'])) {
+            $guild = parent::get($data['id']);
             $guild->_patch($data);
             return $guild;
         }

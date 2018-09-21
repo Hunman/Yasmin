@@ -48,8 +48,8 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
             return $user->user;
         }
         
-        if($this->has($user)) {
-            return $this->get($user);
+        if(parent::has($user)) {
+            return parent::get($user);
         }
         
         throw new \InvalidArgumentException('Unable to resolve unknown user');
@@ -61,8 +61,8 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
      * @return \CharlotteDunois\Yasmin\Models\User|null
      */
     function patch(array $user) {
-        if($this->has($user['id'])) {
-            return $this->get($user['id']);
+        if(parent::has($user['id'])) {
+            return parent::get($user['id']);
         }
         
         if(count($user) === 1) {
@@ -127,8 +127,8 @@ class UserStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\
      * @internal
      */
     function factory(array $data, bool $userFetched = false) {
-        if($this->has($data['id'])) {
-            $user = $this->get($data['id']);
+        if(parent::has($data['id'])) {
+            $user = parent::get($data['id']);
             $user->_patch($data);
             return $user;
         }
