@@ -23,7 +23,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class PartialChannel extends ClientBase {
     /**
      * The channel ID.
-     * @var string
+     * @var int
      */
     protected $id;
     

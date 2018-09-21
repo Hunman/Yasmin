@@ -130,7 +130,7 @@ class Guild extends ClientBase {
     
     /**
      * The guild ID.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -166,7 +166,7 @@ class Guild extends ClientBase {
     
     /**
      * The ID of the owner.
-     * @var string
+     * @var int
      */
     protected $ownerID;
     
@@ -214,13 +214,13 @@ class Guild extends ClientBase {
     
     /**
      * The ID of the system channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $systemChannelID;
     
     /**
      * The ID of the afk channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $afkChannelID;
     
@@ -244,7 +244,7 @@ class Guild extends ClientBase {
     
     /**
      * The ID of the application which created this guild, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $applicationID;
     
@@ -256,7 +256,7 @@ class Guild extends ClientBase {
     
     /**
      * The ID of the embed channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $embedChannelID;
     
@@ -268,7 +268,7 @@ class Guild extends ClientBase {
     
     /**
      * The ID of the widget channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $widgetChannelID;
     

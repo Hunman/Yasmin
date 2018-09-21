@@ -38,13 +38,13 @@ class DMChannel extends ClientBase
     
     /**
      * The channel type.
-     * @var string
+     * @var int
      */
     protected $type;
     
     /**
      * The owner ID of this channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $ownerID;
     

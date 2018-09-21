@@ -24,7 +24,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class OAuthApplication extends ClientBase {
     /**
      * The application ID.
-     * @var string
+     * @var int
      */
     protected $id;
     

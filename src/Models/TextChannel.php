@@ -48,7 +48,7 @@ class TextChannel extends ClientBase
     
     /**
      * The channel ID.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -60,7 +60,7 @@ class TextChannel extends ClientBase
     
     /**
      * The ID of the parent channel, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $parentID;
     

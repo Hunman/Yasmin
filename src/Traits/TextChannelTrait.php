@@ -31,7 +31,7 @@ trait TextChannelTrait {
     
     /**
      * The last message's ID, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $lastMessageID;
     

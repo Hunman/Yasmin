@@ -35,7 +35,7 @@ class Emoji extends ClientBase {
     
     /**
      * The emoji ID, or null for unicode emoji.
-     * @var string|null
+     * @var int|null
      */
     protected $id;
     

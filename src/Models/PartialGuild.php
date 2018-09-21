@@ -23,7 +23,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class PartialGuild extends ClientBase {
     /**
      * The guild ID.
-     * @var string
+     * @var int
      */
     protected $id;
     

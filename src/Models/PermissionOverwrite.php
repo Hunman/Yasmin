@@ -30,7 +30,7 @@ class PermissionOverwrite extends ClientBase {
     
     /**
      * The ID of the Permission Overwrite.
-     * @var string
+     * @var int
      */
     protected $id;
     

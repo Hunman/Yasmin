@@ -18,7 +18,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class GroupDMChannel extends DMChannel {
     /**
      * The application which created the group DM channel.
-     * @var string|null
+     * @var int|null
      */
     protected $applicationID;
     

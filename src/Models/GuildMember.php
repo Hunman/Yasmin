@@ -41,7 +41,7 @@ class GuildMember extends ClientBase {
     
     /**
      * The ID of the member.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -83,7 +83,7 @@ class GuildMember extends ClientBase {
     
     /**
      * The ID of the voice channel the member is in, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $voiceChannelID;
     

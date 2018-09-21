@@ -69,7 +69,7 @@ class Message extends ClientBase {
     
     /**
      * The message ID.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -135,7 +135,7 @@ class Message extends ClientBase {
     
     /**
      * ID of the webhook that sent the message, if applicable, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $webhookID;
     

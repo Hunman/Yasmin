@@ -35,7 +35,7 @@ class CategoryChannel extends ClientBase
     
     /**
      * The ID of the channel.
-     * @var string
+     * @var int
      */
     protected $id;
     

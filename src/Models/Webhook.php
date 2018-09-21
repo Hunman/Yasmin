@@ -23,7 +23,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class Webhook extends ClientBase {
     /**
      * The webhook ID.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -41,13 +41,13 @@ class Webhook extends ClientBase {
     
     /**
      * The channel ID the webhook belongs to.
-     * @var string|null
+     * @var int|null
      */
     protected $channelID;
     
     /**
      * The guild ID the webhook belongs to, or null.
-     * @var string|null
+     * @var int|null
      */
     protected $guildID;
     

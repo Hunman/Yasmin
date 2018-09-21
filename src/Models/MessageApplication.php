@@ -21,7 +21,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class MessageApplication extends ClientBase {
     /**
      * The ID of the application.
-     * @var string
+     * @var int
      */
     protected $id;
     

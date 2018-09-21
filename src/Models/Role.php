@@ -64,7 +64,7 @@ class Role extends ClientBase {
     
     /**
      * The role ID.
-     * @var string
+     * @var int
      */
     protected $id;
     

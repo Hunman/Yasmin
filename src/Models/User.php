@@ -22,15 +22,18 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property boolean|null                                         $verified           Whether the email on this account has been verified, or null if no information provided.
  * @property boolean                                              $webhook            Determines wether the user is a webhook or not.
  * @property int                                                  $createdTimestamp   The timestamp of when this user was created.
- * @property int|null                                             $lastMessageID      The last message ID from the user while the bot was online, or null.
  *
  * @property \DateTime                                            $createdAt          An DateTime instance of the createdTimestamp.
+ * @property int                                                  $defaultAvatar      DEPRECATED: The identifier of the default avatar for this user.
+ * @property \CharlotteDunois\Yasmin\Models\DMChannel|null        $dmChannel          DEPRECATED: The DM channel for this user, if it exists, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Message|null          $lastMessage        DEPRECATED (with no replacement): The last message the user sent while the client was online, or null.
+ * @property \CharlotteDunois\Yasmin\Models\Presence|null         $presence           DEPRECATED: The presence for this user, or null.
  * @property string                                               $tag                Username#Discriminator.
  */
 class User extends ClientBase {
     /**
      * The user ID.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -89,6 +92,12 @@ class User extends ClientBase {
     protected $createdTimestamp;
     
     /**
+     * DEPRECATED: The last ID of the message the user sent while the client was online, or null.
+     * @var int|null
+     */
+    public $lastMessageID;
+    
+    /**
      * Whether the user fetched this user.
      * @var bool
      */
@@ -123,6 +132,32 @@ class User extends ClientBase {
             case 'createdAt':
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeDateTime($this->createdTimestamp);
             break;
+            case 'defaultAvatar': // TODO: DEPRECATED
+                return ($this->discriminator % 5);
+            break;
+            case 'dmChannel': // TODO: DEPRECATED
+                $channel = $this->client->get()->channels->first(function ($channel) {
+                    return ($channel->type === 'dm' && $channel->isRecipient($this));
+                });
+                
+                return $channel;
+            break;
+            case 'lastMessage': // TODO: DEPRECATED
+                if($this->lastMessageID !== null) {
+                    $channel = $this->client->get()->channels->first(function ($channel) {
+                        return ($channel->type === 'text' && $channel->messages->has($this->lastMessageID));
+                    });
+                    
+                    if($channel) {
+                        return $channel->messages->get($this->lastMessageID);
+                    }
+                }
+                
+                return null;
+            break;
+            case 'presence': // TODO: DEPRECATED
+                return $this->getPresence();
+            break;
             case 'tag':
                 return $this->username.'#'.$this->discriminator;
             break;
@@ -148,7 +183,7 @@ class User extends ClientBase {
      */
     function createDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->client->channels->first(function ($channel) {
+            $channel = $this->client->get()->channels->first(function ($channel) {
                 return ($channel->type === 'dm' && $channel->isRecipient($this));
             });
             
@@ -156,8 +191,8 @@ class User extends ClientBase {
                 return $resolve($channel);
             }
             
-            $this->client->apimanager()->endpoints->user->createUserDM($this->id)->done(function ($data) use ($resolve) {
-                $channel = $this->client->channels->factory($data);
+            $this->client->get()->apimanager()->endpoints->user->createUserDM($this->id)->done(function ($data) use ($resolve) {
+                $channel = $this->client->get()->channels->factory($data);
                 $resolve($channel);
             }, $reject);
         }));
@@ -169,7 +204,7 @@ class User extends ClientBase {
      */
     function deleteDM() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $channel = $this->client->channels->first(function ($channel) {
+            $channel = $this->client->get()->channels->first(function ($channel) {
                 return ($channel->type === 'dm' && $channel->isRecipient($this));
             });
             
@@ -177,8 +212,8 @@ class User extends ClientBase {
                 return $resolve($this);
             }
             
-            $this->client->apimanager()->endpoints->channel->deleteChannel($channel->id)->done(function () use ($channel, $resolve) {
-                $this->client->channels->delete($channel->id);
+            $this->client->get()->apimanager()->endpoints->channel->deleteChannel($channel->id)->done(function () use ($channel, $resolve) {
+                $this->client->get()->channels->delete($channel->id);
                 $resolve($this);
             }, $reject);
         }));
@@ -244,14 +279,14 @@ class User extends ClientBase {
      * @return \CharlotteDunois\Yasmin\Models\Presence|null
      */
     function getPresence() {
-        if($this->client->presences->has($this->id)) {
-            return $this->client->presences->get($this->id);
+        if($this->client->get()->presences->has($this->id)) {
+            return $this->client->get()->presences->get($this->id);
         }
         
-        foreach($this->client->guilds as $guild) {
+        foreach($this->client->get()->guilds as $guild) {
             if($guild->presences->has($this->id)) {
                 $presence = $guild->presences->get($this->id);
-                $this->client->presences->set($this->id, $presence);
+                $this->client->get()->presences->set($this->id, $presence);
                 
                 return $presence;
             }
@@ -268,10 +303,10 @@ class User extends ClientBase {
      */
     function fetchUserConnections(string $accessToken) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($accessToken) {
-            $this->client->apimanager()->endpoints->user->getUserConnections($accessToken)->done(function ($data) use ($resolve) {
+            $this->client->get()->apimanager()->endpoints->user->getUserConnections($accessToken)->done(function ($data) use ($resolve) {
                 $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
                 foreach($data as $conn) {
-                    $connection = new \CharlotteDunois\Yasmin\Models\UserConnection($this->client, $this, $conn);
+                    $connection = new \CharlotteDunois\Yasmin\Models\UserConnection($this->client->get(), $this, $conn);
                     $collect->set($connection->id, $connection);
                 }
                 

@@ -25,7 +25,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class MessageAttachment extends Base {
     /**
      * The attachment ID
-     * @var string
+     * @var int
      */
     protected $id;
     

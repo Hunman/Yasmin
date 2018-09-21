@@ -69,7 +69,7 @@ class AuditLogEntry extends ClientBase {
     
     /**
      * The ID of the audit log.
-     * @var string
+     * @var int
      */
     protected $id;
     
@@ -81,7 +81,7 @@ class AuditLogEntry extends ClientBase {
     
     /**
      * The ID of the user which triggered the audit log.
-     * @var string
+     * @var int
      */
     protected $userID;
     
