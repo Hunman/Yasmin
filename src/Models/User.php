@@ -88,12 +88,6 @@ class User extends ClientBase {
     protected $createdTimestamp;
     
     /**
-     * DEPRECATED: The last ID of the message the user sent while the client was online, or null.
-     * @var int|null
-     */
-    public $lastMessageID;
-    
-    /**
      * Whether the user fetched this user.
      * @var bool
      */
