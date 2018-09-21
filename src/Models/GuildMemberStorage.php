@@ -71,7 +71,7 @@ class GuildMemberStorage extends Storage implements \CharlotteDunois\Yasmin\Inte
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {

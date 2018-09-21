@@ -86,7 +86,7 @@ class MessageStorage extends Storage implements \CharlotteDunois\Yasmin\Interfac
     
     /**
      * {@inheritdoc}
-     * @param string  $key
+     * @param int  $key
      * @return $this
      */
     function delete($key) {
