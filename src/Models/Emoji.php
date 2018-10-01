@@ -321,7 +321,7 @@ class Emoji extends ClientBase {
      */
     function _patch(array $emoji) {
         $this->name = (string) $emoji['name'];
-        $this->user = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user'])->id : null);
+        $this->userID = (!empty($emoji['user']) ? $this->client->users->patch($emoji['user'])->id : null);
         $this->animated = (bool) ($emoji['animated'] ?? false);
         $this->managed = (bool) ($emoji['managed'] ?? false);
         $this->requireColons = (bool) ($emoji['require_colons'] ?? true);

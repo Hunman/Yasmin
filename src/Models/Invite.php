@@ -111,8 +111,9 @@ class Invite extends ClientBase {
         parent::__construct($client);
         
         $this->code = $invite['code'];
-        $this->guild = (!empty($invite['guild']) ? (($client->guilds->has($invite['guild']['id']) ? $client->guilds->get($invite['guild']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialGuild($client, $invite['guild']))) : null);
-        $this->channel = (($client->channels->has($invite['channel']['id']) ? $client->channels->get($invite['channel']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialChannel($client, $invite['channel'])));
+        $this->guildID = (!empty($invite['guild']) ? (($client->guilds->has($invite['guild']['id']) ? $client->guilds->get($invite['guild']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialGuild($client, $invite['guild']))) : null);
+        $this->channelID = (($client->channels->has($invite['channel']['id']) ? $client->channels->get($invite['channel']['id'])->id : null) ?? (new \CharlotteDunois\Yasmin\Models\PartialChannel($client, $invite['channel'])));
+        $this->inviterID = (!empty($invite['inviter']) ? $client->users->patch($invite['inviter'])->id : null);
         
         $this->createdTimestamp = (!empty($invite['created_at']) ? (new \DateTime($invite['created_at']))->getTimestamp() : null);
         $this->maxUses = $invite['max_uses'] ?? null;

@@ -76,9 +76,10 @@ interface RoleStorageInterface extends StorageInterface {
     
     /**
      * Factory to create (or retrieve existing) roles.
-     * @param array  $data
+     * @param array                                      $data
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Models\Role
      * @internal
      */
-    function factory(array $data);
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null);
 }

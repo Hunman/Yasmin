@@ -84,9 +84,10 @@ interface GuildMemberStorageInterface extends StorageInterface {
     
     /**
      * Factory to create (or retrieve existing) guild members.
-     * @param array  $data
+     * @param array                                      $data
+     * @param \CharlotteDunois\Yasmin\Models\Guild|null  $guild
      * @return \CharlotteDunois\Yasmin\Models\GuildMember
      * @internal
      */
-    function factory(array $data);
+    function factory(array $data, ?\CharlotteDunois\Yasmin\Models\Guild $guild = null);
 }

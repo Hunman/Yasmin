@@ -15,7 +15,7 @@ namespace CharlotteDunois\Yasmin\Models;
 class RoleStorage extends Storage implements \CharlotteDunois\Yasmin\Interfaces\RoleStorageInterface {
     /**
      * The guild ID this storage belongs to.
-     * @var \CharlotteDunois\Yasmin\Models\Guild
+     * @var string
      */
     protected $guildID;
     
