@@ -271,7 +271,7 @@ class WSConnection implements \CharlotteDunois\Events\EventEmitterInterface {
                 $this->once('self.ready', function () use (&$ready, $resolve, $reconnect) {
                     $this->status = \CharlotteDunois\Yasmin\Client::WS_STATUS_CONNECTED;
                     
-                    if($reconnect) {
+                    if($reconnect && $this->wsmanager->client->user !== null) {
                         $this->wsmanager->client->user->setPresence($this->wsmanager->client->user->clientPresence);
                     }
                     
@@ -300,7 +300,7 @@ class WSConnection implements \CharlotteDunois\Events\EventEmitterInterface {
                         if($this->previous) {
                             $this->previous = false;
                         }
-                    } catch (\Throwable | \Exception | \Error $e) {
+                    } catch (\Throwable $e) {
                         $this->previous = !$this->previous;
                         $this->wsmanager->client->emit('error', $e);
                         $this->reconnect(true);
