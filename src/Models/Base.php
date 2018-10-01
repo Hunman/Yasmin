@@ -26,7 +26,6 @@ abstract class Base implements \JsonSerializable, \Serializable {
      * @internal
      */
     function __destruct() {
-        echo 'Destructor called for '.\get_class($this).'#'.\spl_object_id($this).\PHP_EOL;
         $this->_markForDelete();
     }
     
