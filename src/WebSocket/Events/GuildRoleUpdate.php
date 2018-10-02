@@ -47,7 +47,7 @@ class GuildRoleUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInter
                 $role->_patch($data['role']);
                 $this->client->queuedEmit('roleUpdate', $role, $oldRole);
             } else {
-                $role = $guild->roles->factory($data['role']);
+                $role = $guild->roles->factory($data['role'], $guild);
                 $this->client->queuedEmit('roleCreate', $role);
             }
         }
