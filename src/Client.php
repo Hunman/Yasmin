@@ -397,7 +397,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             $this->api = new \CharlotteDunois\Yasmin\HTTP\APIManager($this);
         }
         
-        if(!empty($this->options['http.ratelimitbucket.athena'])) {
+        if(isset($this->options['http.ratelimitbucket.athena'])) {
             $this->options['http.ratelimitbucket.athena'] = new \CharlotteDunois\Athena\AthenaCache($this->loop, $this->options['http.ratelimitbucket.athena']);
         }
         
@@ -1063,14 +1063,14 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      */
     protected function checkOptionsStorages() {
         $storages = array(
-            'channels' => '\\CharlotteDunois\\Yasmin\\Models\\ChannelStorage',
-            'emojis' => '\\CharlotteDunois\\Yasmin\\Models\\EmojiStorage',
-            'guilds' => '\\CharlotteDunois\\Yasmin\\Models\\GuildStorage',
-            'messages' => '\\CharlotteDunois\\Yasmin\\Models\\MessageStorage',
-            'members' => '\\CharlotteDunois\\Yasmin\\Models\\GuildMemberStorage',
-            'presences' => '\\CharlotteDunois\\Yasmin\\Models\\PresenceStorage',
-            'roles' => '\\CharlotteDunois\\Yasmin\\Models\\RoleStorage',
-            'users' => '\\CharlotteDunois\\Yasmin\\Models\\UserStorage'
+            'channels' => \CharlotteDunois\Yasmin\Models\ChannelStorage::class,
+            'emojis' => \CharlotteDunois\Yasmin\Models\EmojiStorage::class,
+            'guilds' => \CharlotteDunois\Yasmin\Models\GuildStorage::class,
+            'messages' => \CharlotteDunois\Yasmin\Models\MessageStorage::class,
+            'members' => \CharlotteDunois\Yasmin\Models\GuildMemberStorage::class,
+            'presences' => \CharlotteDunois\Yasmin\Models\PresenceStorage::class,
+            'roles' => \CharlotteDunois\Yasmin\Models\RoleStorage::class,
+            'users' => \CharlotteDunois\Yasmin\Models\UserStorage::class
         );
         
         foreach($storages as $name => $base) {
