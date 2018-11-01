@@ -89,7 +89,7 @@ class APIManager {
         
         $this->loop = $this->client->loop;
         
-        $this->bucketName = $client->getOption('http.ratelimitbucket.name', '\\CharlotteDunois\\Yasmin\\HTTP\\RatelimitBucket');
+        $this->bucketName = $client->getOption('http.ratelimitbucket.name', \CharlotteDunois\Yasmin\HTTP\RatelimitBucket::class);
     }
     
     /**
@@ -188,12 +188,11 @@ class APIManager {
                 $body = \CharlotteDunois\Yasmin\HTTP\APIRequest::decodeBody($response);
                 
                 if($status >= 300) {
-                    $error = new \RuntimeException($response->getReasonPhrase());
-                    return $reject($error);
+                    throw new \RuntimeException($response->getReasonPhrase());
                 }
                 
                 $resolve($body);
-            } catch (\Throwable | \Exception | \Error $e) {
+            } catch (\Throwable $e) {
                 $reject($e);
             }
         }));
@@ -494,7 +493,7 @@ class APIManager {
         $limit = ($response->hasHeader('X-RateLimit-Limit') ? ((int) $response->getHeader('X-RateLimit-Limit')[0]) : null);
         $remaining = ($response->hasHeader('X-RateLimit-Remaining') ? ((int) $response->getHeader('X-RateLimit-Remaining')[0]) : null);
         $resetTime = ($response->hasHeader('Retry-After')
-            ? (\microtime(true) + (((int) $response->getHeader('Retry-After')[0]) / 1000))
+            ? ((float) \bcadd(\microtime(true), (((int) $response->getHeader('Retry-After')[0]) / 1000)))
             : ($response->hasHeader('X-RateLimit-Reset') ? ((float) \bcadd(\microtime(true), (((int) $response->getHeader('X-RateLimit-Reset')[0]) - $date))) : null)
         );
         

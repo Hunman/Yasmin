@@ -25,15 +25,15 @@ class MessageCreate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
         $this->client = $client;
     }
     
-    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
+    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
         if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $user = $this->client->users->patch($data['author']);
             
-            if(!empty($data['member']) && $channel->type === 'text' && !$channel->guild->members->has($user->id)) {
+            if(!empty($data['member']) && $channel instanceof \CharlotteDunois\Yasmin\Models\TextChannel && !$channel->getGuild()->members->has($user->id)) {
                 $member = $data['member'];
-                $member['user'] = $user->id;
-                $channel->guild->_addMember($member, true);
+                $member['user'] = array('id' => $user->id);
+                $channel->getGuild()->_addMember($member, true);
             }
             
             $message = $channel->_createMessage($data);

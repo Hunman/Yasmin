@@ -12,24 +12,23 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a guild's voice channel.
  *
- * @property int                                                                                      $id                     The ID of the channel.
- * @property string                                                                                   $type                   The type of the channel. ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES})
- * @property int                                                                                      $createdTimestamp       The timestamp of when this channel was created.
- * @property string                                                                                   $name                   The name of the channel.
- * @property int                                                                                      $bitrate                The bitrate of the channel.
- * @property \CharlotteDunois\Yasmin\Models\Guild                                                     $guild                  The guild the channel is in.
- * @property \CharlotteDunois\Yasmin\Utils\Collection                                                 $members                Holds all members which currently are in the voice channel. ({@see \CharlotteDunois\Yasmin\Models\GuildMember})
- * @property int|null                                                                                 $parentID               The ID of the parent channel, or null.
- * @property int                                                                                      $position               The position of the channel.
- * @property \CharlotteDunois\Yasmin\Utils\Collection                                                 $permissionOverwrites   A collection of PermissionOverwrite instances, mapped by their ID.
- * @property int                                                                                      $userLimit              The maximum amount of users allowed in the channel - 0 means unlimited.
+ * @property int                                                  $id                     The ID of the channel.
+ * @property string                                               $type                   The type of the channel. ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES})
+ * @property int                                                  $createdTimestamp       The timestamp of when this channel was created.
+ * @property string                                               $name                   The name of the channel.
+ * @property int                                                  $bitrate                The bitrate of the channel.
+ * @property \CharlotteDunois\Yasmin\Models\Guild                 $guild                  The guild the channel is in.
+ * @property \CharlotteDunois\Collect\Collection                  $members                Holds all members which currently are in the voice channel. ({@see \CharlotteDunois\Yasmin\Models\GuildMember})
+ * @property int|null                                             $parentID               The ID of the parent channel, or null.
+ * @property int                                                  $position               The position of the channel.
+ * @property \CharlotteDunois\Collect\Collection                  $permissionOverwrites   A collection of PermissionOverwrite instances, mapped by their ID.
+ * @property int                                                  $userLimit              The maximum amount of users allowed in the channel - 0 means unlimited.
  *
- * @property bool                                                                                     $full                   Checks if the voice channel is full.
- * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null                                      $parent                 Returns the channel's parent, or null.
+ * @property bool                                                 $full                   Checks if the voice channel is full.
+ * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null  $parent                 Returns the channel's parent, or null.
  */
 class VoiceChannel extends ClientBase
-    implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
-                \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface,
+    implements \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface,
                 \CharlotteDunois\Yasmin\Interfaces\VoiceChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait;
     
@@ -71,7 +70,7 @@ class VoiceChannel extends ClientBase
     
     /**
      * Holds all members which currently are in the voice channel.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $members;
     
@@ -89,7 +88,7 @@ class VoiceChannel extends ClientBase
     
     /**
      * A collection of PermissionOverwrite instances, mapped by their ID.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $permissionOverwrites;
     
@@ -108,8 +107,8 @@ class VoiceChannel extends ClientBase
         
         $this->id = (int) $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
-        $this->members = new \CharlotteDunois\Yasmin\Utils\Collection();
-        $this->permissionOverwrites = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->members = new \CharlotteDunois\Collect\Collection();
+        $this->permissionOverwrites = new \CharlotteDunois\Collect\Collection();
         
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
         

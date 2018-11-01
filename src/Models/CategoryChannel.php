@@ -18,13 +18,11 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Models\Guild                 $guild                  The guild this category channel belongs to.
  * @property int                                                  $createdTimestamp       The timestamp of when this channel was created.
  * @property int                                                  $position               The channel position.
- * @property \CharlotteDunois\Yasmin\Utils\Collection             $permissionOverwrites   A collection of PermissionOverwrite instances.
+ * @property \CharlotteDunois\Collect\Collection                  $permissionOverwrites   A collection of PermissionOverwrite instances.
  *
  * @property \DateTime                                            $createdAt              The DateTime instance of createdTimestamp.
  */
-class CategoryChannel extends ClientBase
-    implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
-                \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface {
+class CategoryChannel extends ClientBase implements \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait;
     
     /**
@@ -59,7 +57,7 @@ class CategoryChannel extends ClientBase
     
     /**
      * A collection of PermissionOverwrite instances.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $permissionOverwrites;
     
@@ -79,7 +77,7 @@ class CategoryChannel extends ClientBase
         $this->id = (int) $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
-        $this->permissionOverwrites = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->permissionOverwrites = new \CharlotteDunois\Collect\Collection();
         
         $this->_patch($channel);
     }

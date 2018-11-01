@@ -74,7 +74,7 @@ abstract class Base implements \JsonSerializable, \Serializable {
             }
         }
         
-        throw new \RuntimeException('Unknown method '.\get_class($this).'::$'.$name);
+        throw new \RuntimeException('Unknown method '.\get_class($this).'::'.$name);
     }
     
     /**
@@ -116,7 +116,7 @@ abstract class Base implements \JsonSerializable, \Serializable {
             }
             
             if(\property_exists($this, $key)) {
-                if($this->$key instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                if($this->$key instanceof \CharlotteDunois\Collect\Collection) {
                     if(!\is_array($val)) {
                         $val = array($val);
                     }

@@ -49,11 +49,15 @@ class DataHelpers {
     }
     
     /**
-     * Sets the React Filesystem instance.
-     * @param \React\Filesystem\FilesystemInterface  $filesystem
+     * Sets the React Filesystem instance, or disables it.
+     * @param \React\Filesystem\FilesystemInterface|null  $filesystem
      * @return void
      */
-    static function setFilesystem(\React\Filesystem\FilesystemInterface $filesystem) {
+    static function setFilesystem(?\React\Filesystem\FilesystemInterface $filesystem) {
+        if($filesystem === null) {
+            $filesystem = false;
+        }
+        
         self::$filesystem = $filesystem;
     }
     
@@ -112,7 +116,7 @@ class DataHelpers {
     static function resolveFileResolvable(string $file) {
         $rfile = @\realpath($file);
         if($rfile) {
-            if(self::$filesystem !== null) {
+            if(self::$filesystem) {
                 return self::$filesystem->getContents($file);
             }
             
@@ -122,6 +126,32 @@ class DataHelpers {
         }
         
         return \React\Promise\reject(new \RuntimeException('Given file is not resolvable'));
+    }
+    
+    /**
+     * Cleans the text from mentions, by providing a context message.
+     * @param \CharlotteDunois\Yasmin\Models\Message  $message
+     * @param string                                  $text
+     * @return string
+     */
+    static function cleanContent(\CharlotteDunois\Yasmin\Models\Message $message, string $text) {
+        /** @var \CharlotteDunois\Yasmin\Interfaces\ChannelInterface  $channel */
+        foreach($message->mentions->channels as $channel) {
+            $text = \str_replace('<#'.$channel->getId().'>', '#'.$channel->name, $text);
+        }
+        
+        /** @var \CharlotteDunois\Yasmin\Models\Role  $role */
+        foreach($message->mentions->roles as $role) {
+            $text = \str_replace($role->__toString(), $role->name, $text);
+        }
+        
+        /** @var \CharlotteDunois\Yasmin\Models\User  $user */
+        foreach($message->mentions->users as $user) {
+            $guildCheck = ($message->channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface && $message->channel->getGuild()->members->has($user->id));
+            $text = \preg_replace('/<@!?'.$user->id.'>/', ($guildCheck ? $message->channel->getGuild()->members->get($user->id)->displayName : $user->username), $text);
+        }
+        
+        return $text;
     }
     
     /**
@@ -287,7 +317,7 @@ class DataHelpers {
                         $file['data'] = $data;
                         return $file;
                     });
-                } elseif(self::$filesystem !== null) {
+                } elseif(self::$filesystem) {
                     $promises[] = self::$filesystem->getContents($file['path'])->then(function ($data) use ($file) {
                         $file['data'] = $data;
                         return $file;
@@ -412,7 +442,7 @@ class DataHelpers {
             return [ 0, $a ];
         }, $filter, $options);
         
-        return $collector->collect()->then(function (\CharlotteDunois\Yasmin\Utils\Collection $bucket) {
+        return $collector->collect()->then(function (\CharlotteDunois\Collect\Collection $bucket) {
             return $bucket->first();
         });
     }

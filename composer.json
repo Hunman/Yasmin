@@ -14,16 +14,21 @@
         "php-64bit": ">=7.1",
         "ext-bcmath": "*",
         "ext-curl": "*",
+        "ext-json": "*",
+        "ext-zlib": "*",
         "ext-mbstring": "*",
+        "charlottedunois/collection": "^0.1.5",
+        "charlottedunois/eventemitter": "^0.1.5",
+        "charlottedunois/validator": "^0.2.0",
+        "guzzlehttp/guzzle": "^6.3.2",
         "ratchet/pawl": "^0.3.1",
         "react/event-loop": "^1.0|^0.5|^0.4.3",
         "react/filesystem": "^0.1.1",
-        "react/promise": "^2.7.0",
-        "guzzlehttp/guzzle": "^6.3.2",
-        "charlottedunois/eventemitter": "^0.1.5",
-        "charlottedunois/validator": "^0.2.0"
+        "react/promise": "^2.7.0"
     },
     "require-dev": {
+        "charlottedunois/athena": "^0.1.1|dev-master",
+        "charlottedunois/kimberly": "^0.1.2|dev-master",
         "psr/http-message": "^1.0"
     },
     "suggest": {

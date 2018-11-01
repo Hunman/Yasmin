@@ -12,7 +12,7 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Base class for all storages.
  */
-class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
+class Storage extends \CharlotteDunois\Collect\Collection
     implements \CharlotteDunois\Yasmin\Interfaces\StorageInterface, \Serializable {
     
     /**
@@ -20,6 +20,12 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @var \CharlotteDunois\Yasmin\Client
      */
     protected $client;
+    
+    /**
+     * Basic storage args.
+     * @var array
+     */
+    protected $baseStorageArgs;
     
     /**
      * Tells the storages to emit `internal.storage.set` and `internal.storage.delete` events.
@@ -33,6 +39,8 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
     function __construct(\CharlotteDunois\Yasmin\Client $client, array $data = null) {
         parent::__construct($data);
         $this->client = $client;
+        
+        $this->baseStorageArgs = array($this->client);
     }
     
     /**
@@ -73,7 +81,9 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      */
     function serialize() {
         $vars = \get_object_vars($this);
+        
         unset($vars['client'], $vars['timer']);
+        $vars['baseStorageArgs'][0] = null;
         
         return \serialize($vars);
     }
@@ -93,6 +103,7 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
         }
         
         $this->client = \CharlotteDunois\Yasmin\Models\ClientBase::$serializeClient;
+        $this->baseStorageArgs[0] = $this->client;
     }
     
     /**
@@ -168,7 +179,10 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @return \CharlotteDunois\Yasmin\Interfaces\StorageInterface
      */
     function copy() {
-        return (new static($this->client, $this->data));
+        $args = $this->baseStorageArgs;
+        $args[] = $this->data;
+        
+        return (new static(...$args));
     }
     
     /**
@@ -177,8 +191,10 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @return \CharlotteDunois\Yasmin\Interfaces\StorageInterface
     */
     function filter(callable $closure) {
-        $col = parent::filter($closure);
-        return (new static($this->client, $col->all()));
+        $args = $this->baseStorageArgs;
+        $args[] = parent::filter($closure)->all();
+        
+        return (new static(...$args));
     }
     
     /**
@@ -188,8 +204,10 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @return \CharlotteDunois\Yasmin\Interfaces\StorageInterface
     */
     function sort(?callable $closure = null, $options = SORT_REGULAR) {
-        $col = parent::sort($closure, $options);
-        return (new static($this->client, $col->all()));
+        $args = $this->baseStorageArgs;
+        $args[] = parent::sort($closure, $options)->all();
+        
+        return (new static(...$args));
     }
     
     /**
@@ -200,8 +218,10 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @return \CharlotteDunois\Yasmin\Interfaces\StorageInterface
     */
     function sortBy($sortkey, $options = \SORT_REGULAR, bool $descending = false) {
-        $col = parent::sortBy($sortkey, $options, $descending);
-        return (new static($this->client, $col->all()));
+        $args = $this->baseStorageArgs;
+        $args[] = parent::sortBy($sortkey, $options, $descending)->all();
+        
+        return (new static(...$args));
     }
     
     /**
@@ -211,7 +231,9 @@ class Storage extends \CharlotteDunois\Yasmin\Utils\Collection
      * @return \CharlotteDunois\Yasmin\Interfaces\StorageInterface
     */
     function sortByDesc($sortkey, $options = \SORT_REGULAR) {
-        $col = parent::sortByDesc($sortkey, $options);
-        return (new static($this->client, $col->all()));
+        $args = $this->baseStorageArgs;
+        $args[] = parent::sortByDesc($sortkey, $options)->all();
+        
+        return (new static(...$args));
     }
 }

@@ -25,7 +25,7 @@ class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
         $this->client = $client;
     }
     
-    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
+    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $channel = $this->client->channels->get($data['channel_id']);
         if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
             $user = $this->client->users->get($data['user_id']);
@@ -36,10 +36,10 @@ class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
             }
             
             $user->done(function (\CharlotteDunois\Yasmin\Models\User $user) use ($channel, $data) {
-                if(!empty($data['member']) && $channel->type === 'text' && !$channel->guild->members->has($user->id)) {
+                if(!empty($data['member']) && $channel instanceof \CharlotteDunois\Yasmin\Models\TextChannel && !$channel->getGuild()->members->has($user->id)) {
                     $member = $data['member'];
                     $member['user'] = $user->id;
-                    $channel->guild->_addMember($member, true);
+                    $channel->getGuild()->_addMember($member, true);
                 }
                 
                 if($channel->_updateTyping($user, $data['timestamp'])) {

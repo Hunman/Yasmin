@@ -15,12 +15,12 @@ namespace CharlotteDunois\Yasmin\Interfaces;
  * @method \CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface  getMessages()       Gets the storage with all cached messages.
  * @method string                                                      getLastMessageID()  Gets the ID of the last sent message in this channel.
  */
-interface TextChannelInterface {
+interface TextChannelInterface extends ChannelInterface {
     /**
      * Deletes multiple messages at once. Resolves with $this.
-     * @param \CharlotteDunois\Yasmin\Utils\Collection|array|int  $messages
-     * @param string                                              $reason
-     * @param bool                                                $filterOldMessages
+     * @param \CharlotteDunois\Collect\Collection|array|int  $messages
+     * @param string                                         $reason
+     * @param bool                                           $filterOldMessages
      * @return \React\Promise\ExtendedPromiseInterface
      */
     function bulkDelete($messages, string $reason = '', bool $filterOldMessages = false);

@@ -105,8 +105,9 @@ trait GuildChannelTrait {
      *    'nsfw' => bool, (text channels only)
      *    'bitrate' => int, (voice channels only)
      *    'userLimit' => int, (voice channels only)
+     *    'slowmode' => int, (text channels only)
      *    'parent' => \CharlotteDunois\Yasmin\Models\CategoryChannel|int, (int = channel ID)
-     *    'permissionOverwrites' => \CharlotteDunois\Yasmin\Utils\Collection|array (an array or Collection of PermissionOverwrite instances or permission overwrite arrays)
+     *    'permissionOverwrites' => \CharlotteDunois\Collect\Collection|array (an array or Collection of PermissionOverwrite instances or permission overwrite arrays)
      * )
      * ```
      *
@@ -146,12 +147,16 @@ trait GuildChannelTrait {
             $data['user_limit'] = (int) $options['userLimit'];
         }
         
+        if(isset($options['slowmode'])) {
+            $data['rate_limit_per_user'] = (int) $options['slowmode'];
+        }
+        
         if(isset($options['parent'])) {
             $data['parent_id'] = ($options['parent'] instanceof \CharlotteDunois\Yasmin\Models\CategoryChannel ? $options['parent']->id : $options['parent']);
         }
         
         if(isset($options['permissionOverwrites'])) {
-            if($options['permissionOverwrites'] instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+            if($options['permissionOverwrites'] instanceof \CharlotteDunois\Collect\Collection) {
                 $options['permissionOverwrites'] = $options['permissionOverwrites']->all();
             }
             
@@ -186,7 +191,7 @@ trait GuildChannelTrait {
     function fetchInvites() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->channel->getChannelInvites($this->id)->done(function ($data) use ($resolve) {
-                $collection = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collection = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $invite) {
                     $inv = new \CharlotteDunois\Yasmin\Models\Invite($this->client, $invite);
@@ -323,13 +328,7 @@ trait GuildChannelTrait {
                 $memberOrRole = $this->guild->roles->resolve($memberOrRole)->id;
                 $options['type'] = 'role';
             } catch (\InvalidArgumentException $e) {
-                try {
-                    $memberOrRole = $this->guild->members->resolve($memberOrRole)->id;
-                    $options['type'] = 'member';
-                } catch (\InvalidArgumentException $e) {
-                    $memberOrRole = $memberOrRole;
-                    $options['type'] = 'member';
-                }
+                $options['type'] = 'member';
             }
         }
         
@@ -451,8 +450,8 @@ trait GuildChannelTrait {
     
     /**
      * Sets the permission overwrites of the channel. Resolves with $this.
-     * @param \CharlotteDunois\Yasmin\Utils\Collection|array  $permissionOverwrites  An array or Collection of PermissionOverwrite instances or permission overwrite arrays.
-     * @param string                                          $reason
+     * @param \CharlotteDunois\Collect\Collection|array  $permissionOverwrites  An array or Collection of PermissionOverwrite instances or permission overwrite arrays.
+     * @param string                                     $reason
      * @return \React\Promise\ExtendedPromiseInterface
      * @throws \InvalidArgumentException
      */
@@ -477,8 +476,12 @@ trait GuildChannelTrait {
         
         $count = $this->guild->channels->count();
         $channels = $this->guild->channels->sort(function ($a, $b) {
+            if($a->position === $b->position) {
+                return $a->id <=> $b->id;
+            }
+            
             return $a->position <=> $b->position;
-        })->all();
+        })->values()->all();
         
         $pos = 0;
         for($i = 0; $i < $count; $i++) {

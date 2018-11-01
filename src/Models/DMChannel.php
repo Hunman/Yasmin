@@ -16,16 +16,14 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                               $type               The channel type. ({@see \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES})
  * @property int                                                  $createdTimestamp   The timestamp of when this channel was created.
  * @property int|null                                             $ownerID            The owner ID of this channel, or null.
- * @property \CharlotteDunois\Yasmin\Utils\Collection             $recipients         The recipients of this channel.
+ * @property \CharlotteDunois\Collect\Collection                  $recipients         The recipients of this channel.
  * @property int|null                                             $lastMessageID      The last message ID, or null.
  * @property \CharlotteDunois\Yasmin\Interfaces\StorageInterface  $messages           The storage with all cached messages.
  *
  * @property \DateTime                                            $createdAt          The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\User|null             $owner              The owner of this channel, or null.
  */
-class DMChannel extends ClientBase
-    implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
-                \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface {
+class DMChannel extends ClientBase implements \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\TextChannelTrait;
     
     /**
@@ -50,7 +48,7 @@ class DMChannel extends ClientBase
     
     /**
      * The recipients of this channel, mapped by user ID.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $recipients;
     
@@ -68,7 +66,7 @@ class DMChannel extends ClientBase
         
         $storage = $this->client->getOption('internal.storages.messages');
         $this->messages = new $storage($this->client, $this);
-        $this->typings = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->typings = new \CharlotteDunois\Collect\Collection();
         
         $this->id = (int) $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
@@ -77,7 +75,7 @@ class DMChannel extends ClientBase
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
         
         $this->ownerID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($channel['owner_id'] ?? null), 'int');
-        $this->recipients = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->recipients = new \CharlotteDunois\Collect\Collection();
         
         if(!empty($channel['recipients'])) {
             foreach($channel['recipients'] as $rec) {

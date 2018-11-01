@@ -12,11 +12,11 @@ namespace CharlotteDunois\Yasmin\Models;
 /**
  * Represents a message reaction.
  *
- * @property \CharlotteDunois\Yasmin\Models\Emoji        $emoji     The emoji this message reaction is for.
- * @property int                                         $count     Times this emoji has been reacted.
- * @property bool                                        $me        Whether the current user has reacted using this emoji.
- * @property \CharlotteDunois\Yasmin\Models\Message      $message   The message this reaction belongs to.
- * @property \CharlotteDunois\Yasmin\Utils\Collection    $users     The users that have given this reaction, mapped by their ID.
+ * @property \CharlotteDunois\Yasmin\Models\Emoji    $emoji     The emoji this message reaction is for.
+ * @property int                                     $count     Times this emoji has been reacted.
+ * @property bool                                    $me        Whether the current user has reacted using this emoji.
+ * @property \CharlotteDunois\Yasmin\Models\Message  $message   The message this reaction belongs to.
+ * @property \CharlotteDunois\Collect\Collection     $users     The users that have given this reaction, mapped by their ID.
  */
 class MessageReaction extends ClientBase {
     /**
@@ -45,7 +45,7 @@ class MessageReaction extends ClientBase {
     
     /**
      * The users that have given this reaction, mapped by their ID.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $users;
     
@@ -59,7 +59,7 @@ class MessageReaction extends ClientBase {
         
         $this->count = (int) $reaction['count'];
         $this->me = (bool) $reaction['me'];
-        $this->users = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->users = new \CharlotteDunois\Collect\Collection();
     }
     
     /**
@@ -96,14 +96,16 @@ class MessageReaction extends ClientBase {
                 $query['after'] = $after;
             }
             
-            $this->client->apimanager()->endpoints->channel->getMessageReactions($this->message->channel->id, $this->message->id, $this->emoji->identifier, $query)->done(function ($data) use ($resolve) {
-                foreach($data as $react) {
-                    $user = $this->client->users->patch($react);
-                    $this->users->set($user->id, $user);
-                }
-                
-                $resolve($this->users);
-            }, $reject);
+            $this->client->apimanager()->endpoints->channel
+                ->getMessageReactions($this->message->channel->getId(), $this->message->id, $this->emoji->identifier, $query)
+                ->done(function ($data) use ($resolve) {
+                    foreach($data as $react) {
+                        $user = $this->client->users->patch($react);
+                        $this->users->set($user->id, $user);
+                    }
+                    
+                    $resolve($this->users);
+                }, $reject);
         }));
     }
     
@@ -119,9 +121,11 @@ class MessageReaction extends ClientBase {
         }
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($user) {
-            $this->client->apimanager()->endpoints->channel->deleteMessageReaction($this->message->channel->id, $this->message->id, ($this->emoji->id ?? \rawurlencode($this->emoji->name)), ($user !== null ? ((string) $user->id) : '@me'))->done(function () use ($resolve) {
-                $resolve($this);
-            }, $reject);
+            $this->client->apimanager()->endpoints->channel
+                ->deleteMessageUserReaction($this->message->channel->getId(), $this->message->id, $this->emoji->identifier, ($user !== null ? ((string) $user->id) : '@me'))
+                ->done(function () use ($resolve) {
+                    $resolve($this);
+                }, $reject);
         }));
     }
     

@@ -15,11 +15,11 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface                              $channel   The channel this Permission Overwrite belongs to.
  * @property int                                                                                   $id        The ID of the Permission Overwrite.
  * @property string                                                                                $type      The type of the overwrite (member or role).
- * @property \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target    The role or guildmember, or null if not a member.
  * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $allow     The allowed Permissions instance.
  * @property \CharlotteDunois\Yasmin\Models\Permissions                                            $deny      The denied Permissions instance.
  *
  * @property \CharlotteDunois\Yasmin\Models\Guild                                                  $guild     The guild this Permission Overwrite belongs to.
+ * @property \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null   $target    The role or guild member, or null if not a cached member.
  */
 class PermissionOverwrite extends ClientBase {
     /**
@@ -39,12 +39,6 @@ class PermissionOverwrite extends ClientBase {
      * @var string
      */
     protected $type;
-    
-    /**
-     * The role or guildmember, or null if not a member.
-     * @var \CharlotteDunois\Yasmin\Models\Role|\CharlotteDunois\Yasmin\Models\GuildMember|null
-     */
-    protected $target;
     
     /**
      * The allowed Permissions instance.
@@ -84,10 +78,10 @@ class PermissionOverwrite extends ClientBase {
         
         switch($name) {
             case 'guild':
-                return $this->channel->guild;
+                return $this->channel->getGuild();
             break;
             case 'target':
-                return ($this->type === 'role' ? $this->channel->guild->roles->get($this->id) : $this->channel->guild->members->get($this->id));
+                return ($this->type === 'role' ? $this->channel->getGuild()->roles->get($this->id) : $this->channel->getGuild()->members->get($this->id));
             break;
         }
         
@@ -130,7 +124,7 @@ class PermissionOverwrite extends ClientBase {
         $options['deny'] = $deny;
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($options, $reason) {
-            $this->client->apimanager()->endpoints->channel->editChannelPermissions($this->channel->id, $this->id, $options, $reason)->done(function () use ($options, $resolve) {
+            $this->client->apimanager()->endpoints->channel->editChannelPermissions($this->channel->getId(), $this->id, $options, $reason)->done(function () use ($options, $resolve) {
                 $this->allow = new \CharlotteDunois\Yasmin\Models\Permissions(($options['allow'] ?? 0));
                 $this->deny = new \CharlotteDunois\Yasmin\Models\Permissions(($options['deny'] ?? 0));
                 $resolve($this);
@@ -145,7 +139,7 @@ class PermissionOverwrite extends ClientBase {
      */
     function delete(string $reason = '') {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($reason) {
-            $this->client->apimanager()->endpoints->channel->deleteChannelPermission($this->channel->id, $this->id, $reason)->then(function () use ($resolve) {
+            $this->client->apimanager()->endpoints->channel->deleteChannelPermission($this->channel->getId(), $this->id, $reason)->then(function () use ($resolve) {
                 $resolve();
             }, $reject);
         }));

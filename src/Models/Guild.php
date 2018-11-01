@@ -364,7 +364,7 @@ class Guild extends ClientBase {
      * ```
      * array(
      *   'nick' => string, (the nickname for the user, requires MANAGE_NICKNAMES permissions)
-     *   'roles' => array|\CharlotteDunois\Yasmin\Utils\Collection, (array or Collection of Role instances or role IDs, requires MANAGE_ROLES permission)
+     *   'roles' => array|\CharlotteDunois\Collect\Collection, (array or Collection of Role instances or role IDs, requires MANAGE_ROLES permission)
      *   'mute' => bool, (whether the user is muted, requires MUTE_MEMBERS permission)
      *   'deaf' => bool, (whether the user is deafened, requires DEAFEN_MEMBERS permission)
      * )
@@ -390,7 +390,7 @@ class Guild extends ClientBase {
             }
             
             if(!empty($options['roles'])) {
-                if($options['roles'] instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                if($options['roles'] instanceof \CharlotteDunois\Collect\Collection) {
                     $options['roles'] = $options['roles']->all();
                 }
                 
@@ -448,7 +448,8 @@ class Guild extends ClientBase {
      *   'topic' => string, (only for text channels)
      *   'bitrate' => int, (only for voice channels)
      *   'userLimit' => int, (only for voice channels, 0 = unlimited)
-     *   'permissionOverwrites' => \CharlotteDunois\Yasmin\Utils\Collection|array, (an array or Collection of PermissionOverwrite instances or permission overwrite arrays*)
+     *   'slowmode' => int, (only for text channels)
+     *   'permissionOverwrites' => \CharlotteDunois\Collect\Collection|array, (an array or Collection of PermissionOverwrite instances or permission overwrite arrays*)
      *   'parent' => \CharlotteDunois\Yasmin\Models\CategoryChannel|int, (int = channel ID)
      *   'nsfw' => bool (only for text channels)
      * )
@@ -490,8 +491,12 @@ class Guild extends ClientBase {
                 $data['user_limit'] = $options['userLimit'];
             }
             
+            if(isset($options['slowmode'])) {
+                $data['rate_limit_per_user'] = (int) $options['slowmode'];
+            }
+            
             if(isset($options['permissionOverwrites'])) {
-                if($options['permissionOverwrites'] instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                if($options['permissionOverwrites'] instanceof \CharlotteDunois\Collect\Collection) {
                     $options['permissionOverwrites'] = $options['permissionOverwrites']->all();
                 }
                 
@@ -517,7 +522,7 @@ class Guild extends ClientBase {
      * Creates a new custom emoji in the guild. Resolves with an instance of Emoji.
      * @param string                                           $file   Filepath or URL, or file data.
      * @param string                                           $name
-     * @param array|\CharlotteDunois\Yasmin\Utils\Collection   $roles  An array or Collection of Role instances or role IDs.
+     * @param array|\CharlotteDunois\Collect\Collection        $roles  An array or Collection of Role instances or role IDs.
      * @param string  $reason
      * @return \React\Promise\ExtendedPromiseInterface
      * @see \CharlotteDunois\Yasmin\Models\Emoji
@@ -525,7 +530,7 @@ class Guild extends ClientBase {
     function createEmoji(string $file, string $name, $roles = array(), string $reason = '') {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($file, $name, $roles, $reason) {
             \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($file)->done(function ($file) use ($name, $roles, $reason, $resolve, $reject) {
-                if($roles instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                if($roles instanceof \CharlotteDunois\Collect\Collection) {
                     $roles = $roles->all();
                 }
                 
@@ -753,7 +758,7 @@ class Guild extends ClientBase {
     function fetchBans() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->guild->getGuildBans($this->id)->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $ban) {
                     $user = $this->client->users->patch($ban['user']);
@@ -775,7 +780,7 @@ class Guild extends ClientBase {
     function fetchInvites() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->guild->getGuildInvites($this->id)->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $inv) {
                     $invite = new \CharlotteDunois\Yasmin\Models\Invite($this->client, $inv);
@@ -891,7 +896,7 @@ class Guild extends ClientBase {
     function fetchVoiceRegions() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->guild->getGuildVoiceRegions($this->id)->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $region) {
                     $voice = new \CharlotteDunois\Yasmin\Models\VoiceRegion($this->client, $region);
@@ -911,7 +916,7 @@ class Guild extends ClientBase {
     function fetchWebhooks() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->webhook->getGuildsWebhooks($this->id)->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $web) {
                     $hook = new \CharlotteDunois\Yasmin\Models\Webhook($this->client, $web);
@@ -1050,7 +1055,7 @@ class Guild extends ClientBase {
             
             foreach($channels as $chan => $position) {
                 if($chan instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
-                    $chan = $chan->id;
+                    $chan = $chan->getId();
                 }
                 
                 $options[] = array('id' => $chan, 'position' => (int) $position);

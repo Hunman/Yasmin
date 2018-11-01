@@ -23,14 +23,16 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property int                                                         $position               The channel position.
  * @property \CharlotteDunois\Yasmin\Utils\Collection                    $permissionOverwrites   A collection of PermissionOverwrite instances.
  * @property int|null                                                    $lastMessageID          The last message ID, or null.
+ * @property int                                                         $slowmode               Ratelimit to send one message for each non-bot user, without `MANAGE_CHANNEL` and `MANAGE_MESSAGES` permissions, in seconds (0-120).
+ * @property \CharlotteDunois\Collect\Collection                         $permissionOverwrites   A collection of PermissionOverwrite instances, mapped by their ID.
+ * @property int|null                                                    $lastMessageID          The last message ID, or null.
  * @property \CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface  $messages               The storage with all cached messages.
  *
  * @property \DateTime                                                   $createdAt              The DateTime instance of createdTimestamp.
  * @property \CharlotteDunois\Yasmin\Models\CategoryChannel|null         $parent                 The channel's parent, or null.
  */
 class TextChannel extends ClientBase
-    implements \CharlotteDunois\Yasmin\Interfaces\ChannelInterface,
-                \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface,
+    implements \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface,
                 \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface {
     use \CharlotteDunois\Yasmin\Traits\GuildChannelTrait, \CharlotteDunois\Yasmin\Traits\TextChannelTrait;
     
@@ -89,8 +91,14 @@ class TextChannel extends ClientBase
     protected $position;
     
     /**
+     * Ratelimit to send one message for each non-bot user, without `MANAGE_CHANNEL` and `MANAGE_MESSAGES` permissions, in seconds (0-120).
+     * @var int
+     */
+    protected $slowmode;
+    
+    /**
      * A collection of PermissionOverwrite instances, mapped by their ID.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $permissionOverwrites;
     
@@ -109,14 +117,14 @@ class TextChannel extends ClientBase
         
         $storage = $this->client->getOption('internal.storages.messages');
         $this->messages = new $storage($this->client, $this);
-        $this->typings = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->typings = new \CharlotteDunois\Collect\Collection();
         
         $this->id = (int) $channel['id'];
         $this->type = \CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$channel['type']];
         $this->lastMessageID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($channel['last_message_id'] ?? null), 'int');
         
         $this->createdTimestamp = (int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp;
-        $this->permissionOverwrites = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->permissionOverwrites = new \CharlotteDunois\Collect\Collection();
         
         $this->_patch($channel);
     }
@@ -179,7 +187,7 @@ class TextChannel extends ClientBase
     function fetchWebhooks() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->client->apimanager()->endpoints->webhook->getChannelWebhooks($this->id)->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $web) {
                     $hook = new \CharlotteDunois\Yasmin\Models\Webhook($this->client, $web);
@@ -189,6 +197,16 @@ class TextChannel extends ClientBase
                 $resolve($collect);
             }, $reject);
         }));
+    }
+    
+    /**
+     * Sets the slowmode in seconds for this channel.
+     * @param int     $slowmode
+     * @param string  $reason
+     * @return \React\Promise\ExtendedPromiseInterface
+     */
+    function setSlowmode(int $slowmode, string $reason = '') {
+        return $this->edit(array('slowmode' => $slowmode), $reason);
     }
     
     /**
@@ -209,6 +227,7 @@ class TextChannel extends ClientBase
         $this->nsfw = (bool) ($channel['nsfw'] ?? $this->nsfw ?? false);
         $this->parentID = \CharlotteDunois\Yasmin\Utils\DataHelpers::typecastVariable(($channel['parent_id'] ?? $this->parentID ?? null), 'int');
         $this->position = (int) ($channel['position'] ?? $this->position ?? 0);
+        $this->slowmode = (int) ($channel['rate_limit_per_user'] ?? $this->slowmode ?? 0);
         
         if(isset($channel['permission_overwrites'])) {
             $this->permissionOverwrites->clear();

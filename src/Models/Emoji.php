@@ -20,7 +20,7 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property bool                                                 $animated           Whether this emoji is animated.
  * @property boolean                                              $managed            Is the emoji managed?
  * @property boolean                                              $requireColons      Does the emoji require colons?
- * @property \CharlotteDunois\Yasmin\Utils\Collection             $roles              A collection of roles that this emoji is active for (empty if all).
+ * @property \CharlotteDunois\Collect\Collection                  $roles              A collection of roles that this emoji is active for (empty if all).
  *
  * @property \DateTime|null                                       $createdAt          An DateTime instance of the createdTimestamp, or null for unicode emoji.
  * @property string                                               $identifier         The identifier for the emoji.
@@ -47,7 +47,7 @@ class Emoji extends ClientBase {
     
     /**
      * A collection of roles that this emoji is active for (empty if all).
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      */
     protected $roles;
     
@@ -85,7 +85,7 @@ class Emoji extends ClientBase {
         $this->createdTimestamp = ($this->id ? ((int) \CharlotteDunois\Yasmin\Utils\Snowflake::deconstruct($this->id)->timestamp) : null);
         
         $this->guild = ($this->id ? $guild : null);
-        $this->roles = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->roles = new \CharlotteDunois\Collect\Collection();
         
         $this->_patch($emoji);
     }
@@ -165,7 +165,7 @@ class Emoji extends ClientBase {
      * ```
      * array(
      *   'name' => string,
-     *   'roles' => array<string|\CharlotteDunois\Yasmin\Models\Role>|\CharlotteDunois\Yasmin\Utils\Collection<string|\CharlotteDunois\Yasmin\Models\Role>
+     *   'roles' => array<string|\CharlotteDunois\Yasmin\Models\Role>|\CharlotteDunois\Collect\Collection<string|\CharlotteDunois\Yasmin\Models\Role>
      * )
      * ```
      *
@@ -181,7 +181,7 @@ class Emoji extends ClientBase {
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($options, $reason) {
             if(!empty($options['roles'])) {
-                if($options['roles'] instanceof \CharlotteDunois\Yasmin\Utils\Collection) {
+                if($options['roles'] instanceof \CharlotteDunois\Collect\Collection) {
                     $options['roles'] = $options['roles']->all();
                 }
                 
@@ -318,8 +318,8 @@ class Emoji extends ClientBase {
             $this->roles->clear();
             
             foreach($emoji['roles'] as $role) {
-                if($this->guild->roles->has($role['id'])) {
-                    $r = $this->guild->roles->get($role['id']);
+                if($this->guild->roles->has($role)) {
+                    $r = $this->guild->roles->get($role);
                     $this->roles->set($r->id, $r);
                 }
             }

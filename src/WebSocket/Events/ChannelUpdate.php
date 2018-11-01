@@ -34,9 +34,9 @@ class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
         $this->clones = !($clones === true || \in_array('channelUpdate', (array) $clones));
     }
     
-    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
+    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $channel = $this->client->channels->get($data['id']);
-        if($channel) {
+        if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\ChannelInterface) {
             $oldChannel = null;
             if($this->clones) {
                 $oldChannel = clone $channel;
@@ -46,9 +46,9 @@ class ChannelUpdate implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterfa
             
             $prom = array();
             if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface) {
-                foreach($channel->permissionOverwrites as $overwrite) {
+                foreach($channel->getPermissionOverwrites() as $overwrite) {
                     if($overwrite->type === 'member' && $overwrite->target === null) {
-                        $prom[] = $channel->guild->fetchMember($overwrite->id)->then(function (\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
+                        $prom[] = $channel->getGuild()->fetchMember($overwrite->id)->then(function (\CharlotteDunois\Yasmin\Models\GuildMember $member) use ($overwrite) {
                             $overwrite->_patch(array('target' => $member));
                         }, function () {
                             // Do nothing

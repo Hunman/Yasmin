@@ -25,11 +25,11 @@ class GuildDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
         $this->client = $client;
     }
     
-    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, array $data): void {
+    function handle(\CharlotteDunois\Yasmin\WebSocket\WSConnection $ws, $data): void {
         $guild = $this->client->guilds->get($data['id']);
         if($guild) {
             foreach($guild->channels as $channel) {
-                if($channel->type === 'text') {
+                if($channel instanceof \CharlotteDunois\Yasmin\Interfaces\TextChannelInterface) {
                     $channel->stopTyping(true);
                 }
             }
@@ -39,7 +39,7 @@ class GuildDelete implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
                 $this->client->queuedEmit('guildUnavailable', $guild);
             } else {
                 foreach($guild->channels as $channel) {
-                    $this->client->channels->delete($channel->id);
+                    $this->client->channels->delete($channel->getId());
                 }
                 
                 foreach($guild->emojis as $emoji) {

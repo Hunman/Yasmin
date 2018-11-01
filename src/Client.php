@@ -19,7 +19,7 @@ namespace CharlotteDunois\Yasmin;
  * @property \CharlotteDunois\Yasmin\Interfaces\PresenceStorageInterface  $presences  Holds all cached presences (latest ones), mapped by user ID.
  * @property \CharlotteDunois\Yasmin\Interfaces\UserStorageInterface      $users      Holds all cached users, mapped by ID.
  * @property int[]                                                        $pings      The last 3 websocket pings of each shard.
- * @property \CharlotteDunois\Yasmin\Utils\Collection                     $shards     Holds all shards, mapped by shard ID.
+ * @property \CharlotteDunois\Collect\Collection                          $shards     Holds all shards, mapped by shard ID.
  * @property \CharlotteDunois\Yasmin\Models\ClientUser|null               $user       User that the client is logged in as. The instance gets created when the client turns ready.
  *
  * @method on(string $event, callable $listener)               Attach a listener to an event. The method is from the trait - only for documentation purpose here.
@@ -34,7 +34,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * The version of Yasmin.
      * @var string
      */
-    const VERSION = '0.4.3-dev';
+    const VERSION = '0.5.2-dev';
     
     /**
      * WS connection status: Disconnected.
@@ -115,7 +115,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Holds all shards, mapped by shard ID.
-     * @var \CharlotteDunois\Yasmin\Utils\Collection
+     * @var \CharlotteDunois\Collect\Collection
      * @internal
      */
     protected $shards;
@@ -300,7 +300,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
         $this->presences = new $this->options['internal.storages.presences']($this);
         $this->users = new $this->options['internal.storages.users']($this);
         
-        $this->shards = new \CharlotteDunois\Yasmin\Utils\Collection();
+        $this->shards = new \CharlotteDunois\Collect\Collection();
         
         $this->registerUtils();
     }
@@ -370,7 +370,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Unserializes the class and re-registers utils. Automatically creates an event loop.
-     * @param string $vars
+     * @param string  $vars
      * @return void
      * @throws \RuntimeException
      */
@@ -403,7 +403,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             $this->api = new \CharlotteDunois\Yasmin\HTTP\APIManager($this);
         }
         
-        if(!empty($this->options['http.ratelimitbucket.athena'])) {
+        if(isset($this->options['http.ratelimitbucket.athena'])) {
             $this->options['http.ratelimitbucket.athena'] = new \CharlotteDunois\Athena\AthenaCache($this->loop, $this->options['http.ratelimitbucket.athena']);
         }
         
@@ -527,6 +527,12 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
                 }
                 
                 $this->options['numShards'] = $maxShard - $minShard + 1;
+                
+                $remlogin = ($url['remaining'] ?? \INF);
+                if($remlogin < $this->options['numShards']) {
+                    throw new \RangeException('Remaining gateway identify limit is not sufficient ('.$remlogin.' - '.$this->options['numShards'].' shards)');
+                }
+                
                 $prom = \React\Promise\resolve();
                 
                 for($shard = $minShard; $shard <= $maxShard; $shard++) {
@@ -803,7 +809,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     function fetchVoiceRegions() {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
             $this->api->endpoints->voice->listVoiceRegions()->done(function ($data) use ($resolve) {
-                $collect = new \CharlotteDunois\Yasmin\Utils\Collection();
+                $collect = new \CharlotteDunois\Collect\Collection();
                 
                 foreach($data as $region) {
                     $voice = new \CharlotteDunois\Yasmin\Models\VoiceRegion($this, $region);
@@ -1054,14 +1060,14 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      */
     protected function checkOptionsStorages() {
         $storages = array(
-            'channels' => '\\CharlotteDunois\\Yasmin\\Models\\ChannelStorage',
-            'emojis' => '\\CharlotteDunois\\Yasmin\\Models\\EmojiStorage',
-            'guilds' => '\\CharlotteDunois\\Yasmin\\Models\\GuildStorage',
-            'messages' => '\\CharlotteDunois\\Yasmin\\Models\\MessageStorage',
-            'members' => '\\CharlotteDunois\\Yasmin\\Models\\GuildMemberStorage',
-            'presences' => '\\CharlotteDunois\\Yasmin\\Models\\PresenceStorage',
-            'roles' => '\\CharlotteDunois\\Yasmin\\Models\\RoleStorage',
-            'users' => '\\CharlotteDunois\\Yasmin\\Models\\UserStorage'
+            'channels' => \CharlotteDunois\Yasmin\Models\ChannelStorage::class,
+            'emojis' => \CharlotteDunois\Yasmin\Models\EmojiStorage::class,
+            'guilds' => \CharlotteDunois\Yasmin\Models\GuildStorage::class,
+            'messages' => \CharlotteDunois\Yasmin\Models\MessageStorage::class,
+            'members' => \CharlotteDunois\Yasmin\Models\GuildMemberStorage::class,
+            'presences' => \CharlotteDunois\Yasmin\Models\PresenceStorage::class,
+            'roles' => \CharlotteDunois\Yasmin\Models\RoleStorage::class,
+            'users' => \CharlotteDunois\Yasmin\Models\UserStorage::class
         );
         
         foreach($storages as $name => $base) {

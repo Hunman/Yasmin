@@ -178,7 +178,7 @@ interface ClientEvents {
      * @return void
      * @see \CharlotteDunois\Yasmin\Models\GuildMember
      */
-    function guildMembersChunk(\CharlotteDunois\Yasmin\Models\Guild $guild, \CharlotteDunois\Yasmin\Utils\Collection $members);
+    function guildMembersChunk(\CharlotteDunois\Yasmin\Models\Guild $guild, \CharlotteDunois\Collect\Collection $members);
     
     /**
      * Emitted when a role gets created.
@@ -221,7 +221,7 @@ interface ClientEvents {
      * @return void
      * @see \CharlotteDunois\Yasmin\Models\Message
      */
-    function messageDeleteBulk(\CharlotteDunois\Yasmin\Utils\Collection $messages);
+    function messageDeleteBulk(\CharlotteDunois\Collect\Collection $messages);
     
     /**
      * Emitted when someone reacts to a (cached) message.
@@ -267,10 +267,11 @@ interface ClientEvents {
     
     /**
      * Emitted when Discord responds to the user's Voice State Update event.
+     * If you get `null` for `$data`, then this means that there's no endpoint yet and need to await it = Awaiting Endpoint.
      * @return void
      * @see https://discordapp.com/developers/docs/topics/gateway#voice-server-update
      */
-    function voiceServerUpdate(array $data);
+    function voiceServerUpdate(?array $data);
     
     /**
      * Emitted when a member's voice state changes (leaves/joins/etc.).
