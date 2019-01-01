@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -12,7 +12,7 @@ namespace CharlotteDunois\Yasmin\HTTP;
 /**
  * Represents an error from the Discord API.
  */
-final class DiscordAPIException extends \Exception {
+class DiscordAPIException extends \Exception {
     /**
      * The path of the request relative to the HTTP endpoint.
      * @var string

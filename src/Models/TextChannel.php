@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -163,7 +163,7 @@ class TextChannel extends ClientBase
     function createWebhook(string $name, ?string $avatar = null, string $reason = '') {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($name, $avatar, $reason) {
             if(!empty($avatar)) {
-                $file = \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($avatar)->then(function ($avatar) {
+                $file = \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($avatar)->then(function ($avatar) {
                     return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeBase64URI($avatar);
                 });
             } else {

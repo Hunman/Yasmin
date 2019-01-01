@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -228,7 +228,7 @@ trait TextChannelTrait {
      */
     function send(string $content, array $options = array()) {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($content, $options) {
-            \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveMessageOptionsFiles($options)->done(function ($files) use ($content, $options, $resolve, $reject) {
+            \CharlotteDunois\Yasmin\Utils\MessageHelpers::resolveMessageOptionsFiles($options)->done(function ($files) use ($content, $options, $resolve, $reject) {
                 $msg = array(
                     'content' => $content
                 );
@@ -252,7 +252,7 @@ trait TextChannelTrait {
                 
                 if(isset($options['split'])) {
                     $options['split'] = $split = \array_merge(\CharlotteDunois\Yasmin\Models\Message::DEFAULT_SPLIT_OPTIONS, (\is_array($options['split']) ? $options['split'] : array()));
-                    $messages = \CharlotteDunois\Yasmin\Utils\DataHelpers::splitMessage($msg['content'], $options['split']);
+                    $messages = \CharlotteDunois\Yasmin\Utils\MessageHelpers::splitMessage($msg['content'], $options['split']);
                     
                     if(\count($messages) > 1) {
                         $collection = new \CharlotteDunois\Collect\Collection();
@@ -398,7 +398,7 @@ trait TextChannelTrait {
     /**
      * @param \CharlotteDunois\Yasmin\Models\User  $user
      * @param int|null                             $timestamp
-     * @return boolean
+     * @return bool
      * @internal
      */
     function _updateTyping(\CharlotteDunois\Yasmin\Models\User $user, ?int $timestamp = null) {

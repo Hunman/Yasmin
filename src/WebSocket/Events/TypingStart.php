@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -38,7 +38,7 @@ class TypingStart implements \CharlotteDunois\Yasmin\Interfaces\WSEventInterface
             $user->done(function (\CharlotteDunois\Yasmin\Models\User $user) use ($channel, $data) {
                 if(!empty($data['member']) && $channel instanceof \CharlotteDunois\Yasmin\Models\TextChannel && !$channel->getGuild()->members->has($user->id)) {
                     $member = $data['member'];
-                    $member['user'] = $user->id;
+                    $member['user'] = array('id' => $user->id);
                     $channel->getGuild()->_addMember($member, true);
                 }
                 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -388,13 +388,14 @@ class Message extends ClientBase {
      * Reacts to the message with the specified unicode or custom emoji. Resolves with an instance of MessageReaction.
      * @param \CharlotteDunois\Yasmin\Models\Emoji|\CharlotteDunois\Yasmin\Models\MessageReaction|string  $emoji
      * @return \React\Promise\ExtendedPromiseInterface
+     * @throws \InvalidArgumentException
      * @see \CharlotteDunois\Yasmin\Models\MessageReaction
      */
     function react($emoji) {
         try {
             $emoji = $this->client->emojis->resolve($emoji);
         } catch (\InvalidArgumentException $e) {
-            if(\is_numeric($e)) {
+            if(\is_numeric($emoji)) {
                 throw $e;
             }
             
@@ -415,7 +416,7 @@ class Message extends ClientBase {
                 return ($user->id === $this->client->user->id && $reaction->message->id === $this->id && $reaction->emoji->identifier === $emoji);
             };
             
-            $prom = \CharlotteDunois\Yasmin\Utils\DataHelpers::waitForEvent($this->client, 'messageReactionAdd', $filter, array('time' => 30))->then(function ($args) use ($resolve) {
+            $prom = \CharlotteDunois\Yasmin\Utils\EventHelpers::waitForEvent($this->client, 'messageReactionAdd', $filter, array('time' => 30))->then(function ($args) use ($resolve) {
                 $resolve($args[0]);
             })->otherwise(function ($error) use ($reject) {
                 if($error instanceof \RangeException) {
@@ -525,7 +526,7 @@ class Message extends ClientBase {
         }
         
         $this->mentions = new \CharlotteDunois\Yasmin\Models\MessageMentions($this->client, $this, $message);
-        $this->cleanContent = \CharlotteDunois\Yasmin\Utils\DataHelpers::cleanContent($this, $this->content);
+        $this->cleanContent = \CharlotteDunois\Yasmin\Utils\MessageHelpers::cleanContent($this, $this->content);
         
         if(!empty($message['member']) && $this->guild !== null && !$this->guild->members->has($this->author->id)) {
             $member = $message['member'];

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -201,31 +201,14 @@ class Role extends ClientBase {
             throw new \InvalidArgumentException('Unable to edit role with zero information');
         }
         
-        $data = array();
-        
-        if(isset($options['name'])) {
-            $data['name'] = $options['name'];
-        }
-        
-        if(isset($options['color'])) {
-            $data['color'] = \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveColor($options['color']);
-        }
-        
-        if(isset($options['hoist'])) {
-            $data['hoist'] = (bool) $options['hoist'];
-        }
-        
-        if(isset($options['position'])) {
-            $data['position'] = (int) $options['position'];
-        }
-        
-        if(isset($options['permissions'])) {
-            $data['permissions'] = $options['permissions'];
-        }
-        
-        if(isset($options['mentionable'])) {
-            $data['mentionable'] = (bool) $options['mentionable'];
-        }
+        $data = \CharlotteDunois\Yasmin\Utils\DataHelpers::applyOptions($options, array(
+            'name' => array('type' => 'string'),
+            'color' => array('parse' => array(\CharlotteDunois\Yasmin\Utils\DataHelpers::class, 'resolveColor')),
+            'hoist' => array('type' => 'bool'),
+            'position' => array('type' => 'int'),
+            'permissions' => null,
+            'mentionable' => array('type' => 'bool')
+        ));
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($data, $reason) {
             $this->client->apimanager()->endpoints->guild->modifyGuildRole($this->guild->id, $this->id, $data, $reason)->done(function () use ($resolve) {
@@ -252,8 +235,8 @@ class Role extends ClientBase {
      * @return int
      */
     function getCalculatedPosition() {
-        $sorted = $this->guild->roles->sortByDesc(function ($role) {
-            return $role->position;
+        $sorted = $this->guild->roles->sortCustom(function (\CharlotteDunois\Yasmin\Models\Role $a, \CharlotteDunois\Yasmin\Models\Role $b) {
+            return $b->comparePositionTo($a);
         });
         
         return $sorted->indexOf($this);

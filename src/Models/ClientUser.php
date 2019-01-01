@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -75,7 +75,7 @@ class ClientUser extends User {
         }
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($avatar) {
-            \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($avatar)->done(function ($data) use ($resolve, $reject) {
+            \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($avatar)->done(function ($data) use ($resolve, $reject) {
                 $image = \CharlotteDunois\Yasmin\Utils\DataHelpers::makeBase64URI($data);
                 
                 $this->client->apimanager()->endpoints->user->modifyCurrentUser(array('avatar' => $image))->done(function () use ($resolve) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -446,6 +446,7 @@ class Guild extends ClientBase {
      *   'name' => string,
      *   'type' => 'category'|'text'|'voice', (defaults to 'text')
      *   'topic' => string, (only for text channels)
+     *   'position' => int,
      *   'bitrate' => int, (only for voice channels)
      *   'userLimit' => int, (only for voice channels, 0 = unlimited)
      *   'slowmode' => int, (only for text channels)
@@ -474,42 +475,32 @@ class Guild extends ClientBase {
         }
         
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($options, $reason) {
-            $data = array(
-                'name' => $options['name'],
-                'type' => (\CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[($options['type'] ?? 'text')] ?? 0)
-            );
-            
-            if(isset($options['topic'])) {
-                $data['topic'] = (string) $options['topic'];
-            }
-            
-            if(isset($options['bitrate'])) {
-                $data['bitrate'] = (int) $options['bitrate'];
-            }
-            
-            if(isset($options['userLimit'])) {
-                $data['user_limit'] = $options['userLimit'];
-            }
-            
-            if(isset($options['slowmode'])) {
-                $data['rate_limit_per_user'] = (int) $options['slowmode'];
-            }
-            
-            if(isset($options['permissionOverwrites'])) {
-                if($options['permissionOverwrites'] instanceof \CharlotteDunois\Collect\Collection) {
-                    $options['permissionOverwrites'] = $options['permissionOverwrites']->all();
-                }
-                
-                $data['permission_overwrites'] = \array_values($options['permissionOverwrites']);
-            }
-            
-            if(isset($options['parent'])) {
-                $data['parent_id'] = ($options['parent'] instanceof \CharlotteDunois\Yasmin\Models\CategoryChannel ? $options['parent']->id : $options['parent']);
-            }
-            
-            if(isset($options['nsfw'])) {
-                $data['nsfw'] = $options['nsfw'];
-            }
+            $data = \CharlotteDunois\Yasmin\Utils\DataHelpers::applyOptions($options, array(
+                'name' => array('type' => 'string'),
+                'type' => array('type' => 'string', 'parse' => function ($val) {
+                    return (\CharlotteDunois\Yasmin\Models\ChannelStorage::CHANNEL_TYPES[$val] ?? 0);
+                }),
+                'topic' => array('type' => 'string'),
+                'position' => array('type' => 'int'),
+                'bitrate' => array('type' => 'int'),
+                'userLimit' => array('key' => 'user_limit', 'type' => 'int'),
+                'slowmode' => array('key' => 'rate_limit_per_user', 'type' => 'int'),
+                'permissionOverwrites' => array('key' => 'permission_overwrites', 'parse' => function ($val) {
+                    if($val instanceof \CharlotteDunois\Collect\Collection) {
+                        $val = $val->all();
+                    }
+                    
+                    return \array_values($val);
+                }),
+                'parent' => array('key' => 'parent_id', 'parse' => function ($val) {
+                    if($val instanceof \CharlotteDunois\Yasmin\Models\CategoryChannel) {
+                        return $val->id;
+                    }
+                    
+                    return $val;
+                }),
+                'nsfw' => array('type' => 'bool')
+            ));
             
             $this->client->apimanager()->endpoints->guild->createGuildChannel($this->id, $data, $reason)->done(function ($data) use ($resolve) {
                 $channel = $this->client->channels->factory($data, $this);
@@ -529,7 +520,7 @@ class Guild extends ClientBase {
      */
     function createEmoji(string $file, string $name, $roles = array(), string $reason = '') {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($file, $name, $roles, $reason) {
-            \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($file)->done(function ($file) use ($name, $roles, $reason, $resolve, $reject) {
+            \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($file)->done(function ($file) use ($name, $roles, $reason, $resolve, $reject) {
                 if($roles instanceof \CharlotteDunois\Collect\Collection) {
                     $roles = $roles->all();
                 }
@@ -630,55 +621,33 @@ class Guild extends ClientBase {
      */
     function edit(array $options, string $reason = '') {
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($options, $reason) {
-            $data = array();
-            
-            if(!empty($options['name'])) {
-                $data['name'] = $options['name'];
-            }
-            
-            if(!empty($options['region'])) {
-                $data['region'] = $options['region'];
-            }
-            
-            if(isset($options['verificationLevel'])) {
-                $data['verification_level'] = (int) $options['verificationLevel'];
-            }
-            
-            if(isset($options['verificationLevel'])) {
-                $data['explicit_content_filter'] = (int) $options['explicitContentFilter'];
-            }
-            
-            if(isset($options['defaultMessageNotifications'])) {
-                $data['default_message_notifications'] = (int) $options['defaultMessageNotifications'];
-            }
-            
-            if(\array_key_exists('afkChannel', $options)) {
-                $data['afk_channel_id'] = ($options['afkChannel'] === null ? null : ($options['afkChannel'] instanceof \CharlotteDunois\Yasmin\Models\VoiceChannel ? $options['afkChannel']->id : $options['afkChannel']));
-            }
-            
-            if(\array_key_exists('afkTimeout', $options)) {
-                $data['afk_timeout'] = $options['afkTimeout'];
-            }
-            
-            if(\array_key_exists('systemChannel', $options)) {
-                $data['system_channel_id'] = ($options['systemChannel'] === null ? null : ($options['systemChannel'] instanceof \CharlotteDunois\Yasmin\Models\TextChannel ? $options['systemChannel']->id : $options['systemChannel']));
-            }
-            
-            if(isset($options['owner'])) {
-                $data['owner_id'] = ($options['owner'] instanceof \CharlotteDunois\Yasmin\Models\GuildMember ? $options['owner']->id : $options['owner']);
-            }
-            
-            if(isset($options['region'])) {
-                $data['region'] = ($options['region'] instanceof \CharlotteDunois\Yasmin\Models\VoiceRegion ? $options['region']->id : $options['region']);
-            }
+            $data = \CharlotteDunois\Yasmin\Utils\DataHelpers::applyOptions($options, array(
+                'name' => array('type' => 'string'),
+                'region' => array('type' => 'string', 'parse' => function ($val) {
+                    return ($val instanceof \CharlotteDunois\Yasmin\Models\VoiceRegion ? $val->id : $val);
+                }),
+                'verificationLevel' => array('key' => 'verification_level', 'type' => 'int'),
+                'explicitContentFilter' => array('key' => 'explicit_content_filter', 'type' => 'int'),
+                'defaultMessageNotifications' => array('key' => 'default_message_notifications', 'type' => 'int'),
+                'afkChannel' => array('key' => 'afk_channel_id', 'parse' => function ($val) {
+                    return ($val instanceof \CharlotteDunois\Yasmin\Models\VoiceChannel ? $val->id : $val);
+                }),
+                'afkTimeout' => array('key' => 'afk_timeout', 'type' => 'int'),
+                'systemChannel' => array('key' => 'system_channel_id', 'parse' => function ($val) {
+                    return ($val instanceof \CharlotteDunois\Yasmin\Models\TextChannel ? $val->id : $val);
+                }),
+                'owner' => array('key' => 'owner_id', 'parse' => function ($val) {
+                    return ($val instanceof \CharlotteDunois\Yasmin\Models\GuildMember ? $val->id : $val);
+                })
+            ));
             
             $handleImg = function ($img) {
                 return \CharlotteDunois\Yasmin\Utils\DataHelpers::makeBase64URI($img);
             };
             
             $files = array(
-                (isset($options['icon']) ? \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($options['icon'])->then($handleImg) : \React\Promise\resolve(null)),
-                (isset($options['splash']) ? \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($options['splash'])->then($handleImg) : \React\Promise\resolve(null))
+                (isset($options['icon']) ? \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($options['icon'])->then($handleImg) : \React\Promise\resolve(null)),
+                (isset($options['splash']) ? \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($options['splash'])->then($handleImg) : \React\Promise\resolve(null))
             );
             
             \React\Promise\all($files)->done(function ($files) use (&$data, $reason, $resolve, $reject) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -53,7 +53,7 @@ class Json implements \CharlotteDunois\Yasmin\Interfaces\WSEncodingInterface {
      */
     function decode(string $data) {
         $msg = \json_decode($data, true, 512, $this->jsonOptions);
-        if($msg === null || \json_last_error() !== \JSON_ERROR_NONE) {
+        if($msg === null && \json_last_error() !== \JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('The JSON decoder was unable to decode the data. Error: '.\json_last_error_msg());
         }
         

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -98,7 +98,7 @@ interface TextChannelInterface extends ChannelInterface {
     /**
      * @param \CharlotteDunois\Yasmin\Models\User  $user
      * @param int|null                             $timestamp
-     * @return boolean
+     * @return bool
      * @internal
      */
     function _updateTyping(\CharlotteDunois\Yasmin\Models\User $user, ?int $timestamp = null);

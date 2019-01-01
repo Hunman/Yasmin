@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -13,7 +13,7 @@ namespace CharlotteDunois\Yasmin\HTTP;
  * Represents a single HTTP request.
  * @internal
  */
-final class APIRequest {
+class APIRequest {
     /**
      * The JSON encode/decode options.
      * @var int|null
@@ -117,8 +117,6 @@ final class APIRequest {
         
         $options = array(
             'http_errors' => false,
-            'protocols' => array('https'),
-            'expect' => false,
             'headers' => array(
                 'User-Agent' => 'DiscordBot (https://github.com/CharlotteDunois/Yasmin, '.\CharlotteDunois\Yasmin\Client::VERSION.')'
             )
@@ -164,7 +162,7 @@ final class APIRequest {
             $options['headers']['X-Audit-Log-Reason'] = \rawurlencode(\trim($this->options['auditLogReason']));
         }
         
-        $request = new \GuzzleHttp\Psr7\Request($this->method, $url);
+        $request = new \RingCentral\Psr7\Request($this->method, $url);
         $request->requestOptions = $options;
         
         return $request;

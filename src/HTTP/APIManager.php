@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -170,35 +170,6 @@ class APIManager {
     }
     
     /**
-     * Makes an API request synchronously.
-     * @param string  $method
-     * @param string  $endpoint
-     * @param array   $options
-     * @return \React\Promise\ExtendedPromiseInterface
-     */
-    function makeRequestSync(string $method, string $endpoint, array $options) {
-        $apirequest = new \CharlotteDunois\Yasmin\HTTP\APIRequest($this, $method, $endpoint, $options);
-        
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($apirequest) {
-            try {
-                $request = $apirequest->request();
-                $response = \CharlotteDunois\Yasmin\Utils\URLHelpers::makeRequestSync($request, $request->requestOptions);
-                
-                $status = $response->getStatusCode();
-                $body = \CharlotteDunois\Yasmin\HTTP\APIRequest::decodeBody($response);
-                
-                if($status >= 300) {
-                    throw new \RuntimeException($response->getReasonPhrase());
-                }
-                
-                $resolve($body);
-            } catch (\Throwable $e) {
-                $reject($e);
-            }
-        }));
-    }
-    
-    /**
      * Adds an APIRequest to the queue.
      * @param \CharlotteDunois\Yasmin\HTTP\APIRequest  $apirequest
      * @return \React\Promise\ExtendedPromiseInterface
@@ -243,19 +214,10 @@ class APIManager {
     }
     
     /**
-     * Gets the Gateway from the Discord API synchronously.
-     * @param bool  $bot  Should we use the bot endpoint? Requires token.
-     * @return \React\Promise\ExtendedPromiseInterface
-     */
-    function getGatewaySync(bool $bot = false) {
-        return $this->makeRequestSync('GET', 'gateway'.($bot ? '/bot' : ''), array());
-    }
-    
-    /**
      * Processes the queue on future tick.
      * @return void
      */
-    final protected function processFuture() {
+    protected function processFuture() {
         $this->loop->futureTick(function () {
             $this->process();
         });
@@ -265,7 +227,7 @@ class APIManager {
      * Processes the queue delayed, depends on rest time offset.
      * @return void
      */
-    final protected function processDelayed() {
+    protected function processDelayed() {
         $offset = (float) $this->client->getOption('http.restTimeOffset', 0.0);
         if($offset > 0.0) {
             $this->client->addTimer($offset, function () {
@@ -442,7 +404,7 @@ class APIManager {
      * @param \CharlotteDunois\Yasmin\HTTP\APIRequest  $request
      * @return string
      */
-    final function getRatelimitEndpoint(\CharlotteDunois\Yasmin\HTTP\APIRequest $request) {
+    function getRatelimitEndpoint(\CharlotteDunois\Yasmin\HTTP\APIRequest $request) {
         $endpoint = $request->getEndpoint();
         
         if($request->isReactionEndpoint()) {
@@ -473,7 +435,7 @@ class APIManager {
      * @param string $endpoint
      * @return \CharlotteDunois\Yasmin\Interfaces\RatelimitBucketInterface
      */
-    final protected function getRatelimitBucket(string $endpoint) {
+    protected function getRatelimitBucket(string $endpoint) {
         if(empty($this->ratelimits[$endpoint])) {
             $bucket = $this->bucketName;
             $this->ratelimits[$endpoint] = new $bucket($this, $endpoint);
@@ -487,7 +449,7 @@ class APIManager {
      * @param \Psr\Http\Message\ResponseInterface  $response
      * @return mixed[]
      */
-    final function extractRatelimit(\Psr\Http\Message\ResponseInterface $response) {
+    function extractRatelimit(\Psr\Http\Message\ResponseInterface $response) {
         $date = (new \DateTime($response->getHeader('Date')[0]))->getTimestamp();
         
         $limit = ($response->hasHeader('X-RateLimit-Limit') ? ((int) $response->getHeader('X-RateLimit-Limit')[0]) : null);

@@ -1,7 +1,7 @@
 <?php
 /**
  * Yasmin
- * Copyright 2017-2018 Charlotte Dunois, All Rights Reserved
+ * Copyright 2017-2019 Charlotte Dunois, All Rights Reserved
  *
  * Website: https://charuru.moe
  * License: https://github.com/CharlotteDunois/Yasmin/blob/master/LICENSE
@@ -501,10 +501,8 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             
             if(!empty($this->gateway) && !$force) {
                 $gateway = \React\Promise\resolve($this->gateway);
-            } elseif(!empty($this->gateway)) {
-                $gateway = $this->api->getGateway(true);
             } else {
-                $gateway = $this->api->getGatewaySync(true);
+                $gateway = $this->api->getGateway(true);
             }
             
             $gateway->then(function (array $url) {
@@ -732,7 +730,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             }
             
             if(!empty($options['icon'])) {
-                $pr = \CharlotteDunois\Yasmin\Utils\DataHelpers::resolveFileResolvable($options['icon'])->then(function ($icon) use (&$data) {
+                $pr = \CharlotteDunois\Yasmin\Utils\FileHelpers::resolveFileResolvable($options['icon'])->then(function ($icon) use (&$data) {
                     $data['icon'] = $icon;
                 });
             } else {
@@ -889,7 +887,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
     
     /**
      * Cancels a timer.
-     * @param \React\EventLoop\TimerInterface|\React\EventLoop\Timer\TimerInterface  $timer
+     * @param \React\EventLoop\TimerInterface  $timer
      * @return bool
      */
     function cancelTimer($timer) {
@@ -1009,7 +1007,7 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
      * @throws \InvalidArgumentException
      */
     protected function validateClientOptions(array $options) {
-        $validator = \CharlotteDunois\Validation\Validator::make($options, array(
+        \CharlotteDunois\Validation\Validator::make($options, array(
             'disableClones' => 'boolean|array:string',
             'disableEveryone' => 'boolean',
             'fetchAllMembers' => 'boolean',
@@ -1021,7 +1019,8 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'maxShardID' => 'integer|min:0',
             'shardCount' => 'integer|min:1',
             'userSweepInterval' => 'integer|min:0',
-            'http.ratelimitbucket.name' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\RatelimitBucketInterface,string_only',
+            'http.ratelimitbucket.name' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\RatelimitBucketInterface::class.'=string',
+            'http.ratelimitbucket.athena' => 'class:CharlotteDunois\\Athena\\AthenaCache=object',
             'http.requestErrorDelay' => 'integer|min:15',
             'http.requestMaxRetries' => 'integer|min:0',
             'http.restTimeOffset' => 'integer|float',
@@ -1031,26 +1030,17 @@ class Client implements \CharlotteDunois\Events\EventEmitterInterface, \Serializ
             'ws.largeThreshold' => 'integer|min:50|max:250',
             'ws.presence' => 'array',
             'ws.presenceUpdate.ignoreUnknownUsers' => 'boolean',
-            'internal.api.instance' => 'class:CharlotteDunois\\Yasmin\\HTTP\\APIManager',
-            'internal.storages.channels' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\ChannelStorageInterface,string_only',
-            'internal.storages.emojis' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\EmojiStorageInterface,string_only',
-            'internal.storages.guilds' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\GuildStorageInterface,string_only',
-            'internal.storages.messages' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\MessageStorageInterface,string_only',
-            'internal.storages.members' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\GuildMemberStorageInterface,string_only',
-            'internal.storages.presences' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\PresenceStorageInterface,string_only',
-            'internal.storages.roles' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\RoleStorageInterface,string_only',
-            'internal.storages.users' => 'class:CharlotteDunois\\Yasmin\\Interfaces\\UserStorageInterface,string_only',
-            'internal.ws.instance' => 'class:CharlotteDunois\\Yasmin\\WebSocket\\WSManager'
-        ));
-        
-        if($validator->fails()) {
-            $errors = $validator->errors();
-            
-            $name = \array_keys($errors)[0];
-            $error = $errors[$name];
-            
-            throw new \InvalidArgumentException('Client Option '.$name.' '.\lcfirst($error));
-        }
+            'internal.api.instance' => 'class:'.\CharlotteDunois\Yasmin\HTTP\APIManager::class,
+            'internal.storages.channels' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\ChannelStorageInterface::class.'=string',
+            'internal.storages.emojis' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\EmojiStorageInterface::class.'=string',
+            'internal.storages.guilds' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\GuildStorageInterface::class.'=string',
+            'internal.storages.messages' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\MessageStorageInterface::class.'=string',
+            'internal.storages.members' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\GuildMemberStorageInterface::class.'=string',
+            'internal.storages.presences' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\PresenceStorageInterface::class.'=string',
+            'internal.storages.roles' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\RoleStorageInterface::class.'=string',
+            'internal.storages.users' => 'class:'.\CharlotteDunois\Yasmin\Interfaces\UserStorageInterface::class.'=string',
+            'internal.ws.instance' => 'class:'.\CharlotteDunois\Yasmin\WebSocket\WSManager::class
+        ))->throw(\InvalidArgumentException::class);
     }
     
     /**
