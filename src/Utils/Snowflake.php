@@ -49,12 +49,12 @@ class Snowflake {
         
         $time = (string) ($snowflake >> 22);
         
-        $this->timestamp = (float) ((((int) \substr($time, 0, -3)) + self::EPOCH).'.'.\substr($time, -3));
+        $this->timestamp = (float) ((((int) \substr($time, 0, -3)) + static::EPOCH).'.'.\substr($time, -3));
         $this->workerID = ($snowflake & 0x3E0000) >> 17;
         $this->processID = ($snowflake & 0x1F000) >> 12;
         $this->increment = ($snowflake & 0xFFF);
         
-        if($this->timestamp < self::EPOCH || $this->workerID < 0 || $this->workerID >= 32 || $this->processID < 0 || $this->processID >= 32 || $this->increment < 0 || $this->increment >= 4096) {
+        if($this->timestamp < static::EPOCH || $this->workerID < 0 || $this->workerID >= 32 || $this->processID < 0 || $this->processID >= 32 || $this->increment < 0 || $this->increment >= 4096) {
             throw new \InvalidArgumentException('Invalid snow in snowflake');
         }
     }
@@ -78,7 +78,7 @@ class Snowflake {
             break;
         }
         
-        throw new \Exception('Undefined property: '.(self::class).'::$'.$name);
+        throw new \Exception('Undefined property: '.\get_class($this).'::$'.$name);
     }
     
     /**
@@ -107,18 +107,18 @@ class Snowflake {
         
         $time = \microtime(true);
         
-        if($time === self::$incrementTime) {
-            self::$incrementIndex++;
+        if($time === static::$incrementTime) {
+            static::$incrementIndex++;
             
-            if(self::$incrementIndex >= 4095) {
+            if(static::$incrementIndex >= 4095) {
                 \usleep(1000);
                 
                 $time = \microtime(true);
-                self::$incrementIndex = 0;
+                static::$incrementIndex = 0;
             }
         } else {
-            self::$incrementIndex = 0;
-            self::$incrementTime = $time;
+            static::$incrementIndex = 0;
+            static::$incrementTime = $time;
         }
         
         $workerID = \str_pad(\decbin($workerID), 5, 0, \STR_PAD_LEFT);
@@ -129,9 +129,9 @@ class Snowflake {
             $mtime[1] = '000';
         }
         
-        $time = ((string) (((int) $mtime[0]) - self::EPOCH)).\substr($mtime[1], 0, 3);
+        $time = ((string) (((int) $mtime[0]) - static::EPOCH)).\substr($mtime[1], 0, 3);
         
-        $binary = \str_pad(\decbin(((int) $time)), 42, 0, \STR_PAD_LEFT).$workerID.$processID.\str_pad(\decbin(self::$incrementIndex), 12, 0, \STR_PAD_LEFT);
+        $binary = \str_pad(\decbin(((int) $time)), 42, 0, \STR_PAD_LEFT).$workerID.$processID.\str_pad(\decbin(static::$incrementIndex), 12, 0, \STR_PAD_LEFT);
         return \bindec($binary);
     }
     
