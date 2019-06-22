@@ -27,6 +27,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                               $tag                Username#Discriminator.
  */
 class User extends ClientBase {
+    use \CharlotteDunois\Yasmin\Traits\HasImageTrait;
+
     /**
      * The user ID.
      * @var string
@@ -191,13 +193,13 @@ class User extends ClientBase {
      * Get the default avatar URL.
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @return string
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getDefaultAvatarURL(?int $size = 1024) {
-        if($size & ($size - 1)) {
+        if (!$this->isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
-        
+
         return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['defaultavatars'], ($this->discriminator % 5), 'png').(!empty($size) ? '?size='.$size : '');
     }
     
@@ -206,20 +208,21 @@ class User extends ClientBase {
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @param string    $format  One of png, webp, jpg or gif (empty = default format).
      * @return string|null
+     * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getAvatarURL(?int $size = 1024, string $format = '') {
-        if($size & ($size - 1)) {
+        if (!$this->isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
-        
+
         if(!$this->avatar) {
             return null;
         }
-        
+
         if(empty($format)) {
-            $format = $this->getAvatarExtension();
+            $format = $this->getImageExtension($this->avatar);
         }
-        
+
         return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['avatars'], $this->id, $this->avatar, $format).(!empty($size) ? '?size='.$size : '');
     }
     
@@ -228,12 +231,10 @@ class User extends ClientBase {
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @param string    $format  One of png, webp, jpg or gif (empty = default format).
      * @return string
+     * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getDisplayAvatarURL(?int $size = 1024, string $format = '') {
-        if($size & ($size - 1)) {
-            throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
-        }
-        
+        // $size is checked in both getAvatarURL and getDefaultAvatarURL
         return ($this->avatar ? $this->getAvatarURL($size, $format) : $this->getDefaultAvatarURL($size));
     }
     
@@ -298,13 +299,5 @@ class User extends ClientBase {
         $this->email = (string) ($user['email'] ?? '');
         $this->mfaEnabled = (isset($user['mfa_enabled']) ? !empty($user['mfa_enabled']) : null);
         $this->verified = (isset($user['verified']) ? !empty($user['verified']) : null);
-    }
-    
-    /**
-     * Returns default extension for the avatar.
-     * @return string
-     */
-    protected function getAvatarExtension() {
-        return (\strpos($this->avatar, 'a_') === 0 ? 'gif' : 'png');
     }
 }
