@@ -59,6 +59,8 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \CharlotteDunois\Yasmin\Interfaces\GuildChannelInterface|null   $widgetChannel                The guild's widget channel, or null.
  */
 class Guild extends ClientBase {
+    use \CharlotteDunois\Yasmin\Traits\HasImageTrait;
+
     /**
      * Guild default message notifications.
      * @var array
@@ -972,9 +974,10 @@ class Guild extends ClientBase {
      * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @param string    $format  One of png, jpg or webp.
      * @return string|null
+     * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getBannerURL(?int $size = null, string $format = 'png') {
-        if($size & ($size - 1)) {
+        if(!$this->isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
@@ -990,10 +993,15 @@ class Guild extends ClientBase {
      * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @param string    $format  One of png, jpg or webp.
      * @return string|null
+     * @throws \InvalidArgumentException If $size is not a power of 2
      */
-    function getIconURL(?int $size = null, string $format = 'png') {
-        if($size & ($size - 1)) {
+    function getIconURL(?int $size = null, string $format = '') {
+        if (!$this->isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
+        }
+
+        if(empty($format)) {
+            $format = $this->getImageExtension($this->icon);
         }
         
         if($this->icon !== null) {
