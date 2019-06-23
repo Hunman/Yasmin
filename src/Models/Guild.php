@@ -996,7 +996,7 @@ class Guild extends ClientBase {
      * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getIconURL(?int $size = null, string $format = '') {
-        if (!$this->isPowerOfTwo($size)) {
+        if(!$this->isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
 
