@@ -27,8 +27,6 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property string                                               $tag                Username#Discriminator.
  */
 class User extends ClientBase {
-    use \CharlotteDunois\Yasmin\Traits\HasImageTrait;
-    
     /**
      * The user ID.
      * @var string
@@ -196,7 +194,7 @@ class User extends ClientBase {
      * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getDefaultAvatarURL(?int $size = 1024) {
-        if(!$this->isPowerOfTwo($size)) {
+        if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
@@ -211,7 +209,7 @@ class User extends ClientBase {
      * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getAvatarURL(?int $size = 1024, string $format = '') {
-        if(!$this->isPowerOfTwo($size)) {
+        if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
@@ -220,7 +218,7 @@ class User extends ClientBase {
         }
         
         if(empty($format)) {
-            $format = $this->getImageExtension($this->avatar);
+            $format = \CharlotteDunois\Yasmin\Utils\ImageHelpers::getImageExtension($this->avatar);
         }
         
         return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['avatars'], $this->id, $this->avatar, $format).(!empty($size) ? '?size='.$size : '');

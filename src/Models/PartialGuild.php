@@ -21,8 +21,6 @@ namespace CharlotteDunois\Yasmin\Models;
  * @property \DateTime   $createdAt          The DateTime instance of createdTimestamp.
  */
 class PartialGuild extends ClientBase {
-    use \CharlotteDunois\Yasmin\Traits\HasImageTrait;
-    
     /**
      * The guild ID.
      * @var string
@@ -95,7 +93,7 @@ class PartialGuild extends ClientBase {
      * @throws \InvalidArgumentException If $size is not a power of 2
      */
     function getIconURL(?int $size = null, string $format = '') {
-        if(!$this->isPowerOfTwo($size)) {
+        if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
@@ -104,7 +102,7 @@ class PartialGuild extends ClientBase {
         }
         
         if(empty($format)) {
-            $format = $this->getImageExtension($this->icon);
+            $format = \CharlotteDunois\Yasmin\Utils\ImageHelpers::getImageExtension($this->icon);
         }
         
         return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['icons'], $this->id, $this->icon, $format).(!empty($size) ? '?size='.$size : '');
@@ -119,7 +117,7 @@ class PartialGuild extends ClientBase {
      * @return string|null
      */
     function getSplashURL(?int $size = null, string $format = 'png') {
-        if(!$this->isPowerOfTwo($size)) {
+        if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
