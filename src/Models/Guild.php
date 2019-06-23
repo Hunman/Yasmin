@@ -972,7 +972,7 @@ class Guild extends ClientBase {
      * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @param string    $format  One of png, jpg or webp.
      * @return string|null
-     * @throws \InvalidArgumentException If $size is not a power of 2
+     * @throws \InvalidArgumentException Thrown if $size is not a power of 2
      */
     function getBannerURL(?int $size = null, string $format = 'png') {
         if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
@@ -991,22 +991,22 @@ class Guild extends ClientBase {
      * @param int|null  $size    One of 128, 256, 512, 1024 or 2048.
      * @param string    $format  One of png, jpg or webp.
      * @return string|null
-     * @throws \InvalidArgumentException If $size is not a power of 2
+     * @throws \InvalidArgumentException Thrown if $size is not a power of 2
      */
     function getIconURL(?int $size = null, string $format = '') {
         if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
-
+        
+        if($this->icon === null) {
+            return null;
+        }
+        
         if(empty($format)) {
             $format = \CharlotteDunois\Yasmin\Utils\ImageHelpers::getImageExtension($this->icon);
         }
         
-        if($this->icon !== null) {
-            return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['icons'], $this->id, $this->icon, $format).(!empty($size) ? '?size='.$size : '');
-        }
-        
-        return null;
+        return \CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['url'].\CharlotteDunois\Yasmin\HTTP\APIEndpoints::format(\CharlotteDunois\Yasmin\HTTP\APIEndpoints::CDN['icons'], $this->id, $this->icon, $format).(!empty($size) ? '?size='.$size : '');
     }
     
     /**

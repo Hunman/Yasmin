@@ -10,26 +10,24 @@
 namespace CharlotteDunois\Yasmin\Utils;
 
 /**
- * Image Helper methods
+ * Image Helper utilities.
  */
 class ImageHelpers {
     /**
-     * Decides the default extension for an image
-     *
-     * @param  string $image Image hash
-     * @return string        Depending on if animated or not, 'gif' or 'png'
+     * Returns the default extension for an image
+     * @param  string  $image  The image hash.
+     * @return string  Returns "gif" if the hash begins with "a_", otherwise "png".
      */
-    static function getImageExtension(string $image) : string {
+    static function getImageExtension(string $image): string {
         return (\strpos($image, 'a_') === 0 ? 'gif' : 'png');
     }
 
     /**
-     * Decides whether the input number is the power of 2
-     *
-     * @param  int|null $size The size we want to check
-     * @return boolean        Whether it's a power of two
+     * Returns whether the input number is the power of 2
+     * @param int|null  $size
+     * @return bool
      */
-    static function isPowerOfTwo(?int $size) : bool {
-        return $size === null || !($size & ($size - 1));
+    static function isPowerOfTwo(?int $size): bool {
+        return ($size === null || !($size & ($size - 1)));
     }
 }

@@ -191,7 +191,7 @@ class User extends ClientBase {
      * Get the default avatar URL.
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @return string
-     * @throws \InvalidArgumentException If $size is not a power of 2
+     * @throws \InvalidArgumentException Thrown if $size is not a power of 2
      */
     function getDefaultAvatarURL(?int $size = 1024) {
         if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
@@ -206,14 +206,14 @@ class User extends ClientBase {
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @param string    $format  One of png, webp, jpg or gif (empty = default format).
      * @return string|null
-     * @throws \InvalidArgumentException If $size is not a power of 2
+     * @throws \InvalidArgumentException Thrown if $size is not a power of 2
      */
     function getAvatarURL(?int $size = 1024, string $format = '') {
         if(!\CharlotteDunois\Yasmin\Utils\ImageHelpers::isPowerOfTwo($size)) {
             throw new \InvalidArgumentException('Invalid size "'.$size.'", expected any powers of 2');
         }
         
-        if(!$this->avatar) {
+        if($this->avatar === null) {
             return null;
         }
         
@@ -229,7 +229,7 @@ class User extends ClientBase {
      * @param int|null  $size    Any powers of 2 (16-2048).
      * @param string    $format  One of png, webp, jpg or gif (empty = default format).
      * @return string
-     * @throws \InvalidArgumentException If $size is not a power of 2
+     * @throws \InvalidArgumentException Thrown if $size is not a power of 2
      */
     function getDisplayAvatarURL(?int $size = 1024, string $format = '') {
         return ($this->avatar ? $this->getAvatarURL($size, $format) : $this->getDefaultAvatarURL($size));
